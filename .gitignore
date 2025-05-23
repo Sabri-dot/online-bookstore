@@ -1,0 +1,19 @@
+# Node modules (backend dhe frontend)
+node_modules/
+
+# Build folder (React)
+build/
+
+# Env files me fjalëkalime apo variabla private
+.env
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+
+# VS Code settings
+.vscode/
