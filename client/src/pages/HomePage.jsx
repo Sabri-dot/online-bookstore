@@ -5,9 +5,14 @@ const HomePage = () => {
   return (
     <div className="homepage-container">
       <header className="homepage-header">
-        <h1>Welcome to Online BookStore 📚</h1>
-        <p>Discover your next great read with us!</p>
-      </header>
+  <h1 className="text-4xl font-bold text-blue-600 text-center mt-10">
+    Welcome to the Online Bookstore 📚
+  </h1>
+  <p className="text-center text-gray-600 mt-2">
+    Discover your next great read with us!
+  </p>
+</header>
+
 
       <section className="featured-books">
         <h2>Featured Books</h2>
