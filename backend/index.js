@@ -11,9 +11,12 @@ const PORT = process.env.PORT || 5001;
 app.use(cors());
 app.use(express.json());
 
-// Routes (shtojmë ruterat këtu)
+// Routes
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
+
+const bookRoutes = require('./routes/bookRoutes');
+app.use('/api/books', bookRoutes);
 
 // Start server
 app.listen(PORT, () => {
