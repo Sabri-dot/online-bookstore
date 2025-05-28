@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const path = require("path");
 
 dotenv.config();
 
@@ -10,6 +11,9 @@ const PORT = process.env.PORT || 5001;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Shërben file-t statik nga folderi uploads/pdfs nën URL-në /pdfs
+app.use('/pdfs', express.static(path.join(__dirname, 'uploads', 'pdfs')));
 
 // Routes
 const authRoutes = require('./routes/auth');

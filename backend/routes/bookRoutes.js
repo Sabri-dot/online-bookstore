@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const bookController = require('../controllers/bookController');
-const authMiddleware = require('../middlewares/authMiddleware'); // për JWT verifikim
+const authMiddleware = require('../middlewares/authMiddleware'); // JWT verifikim
+const upload = require('../middlewares/uploadMiddleware'); // multer për upload
 
 // Lexo librat (publik)
 router.get('/', bookController.getAllBooks);
@@ -17,5 +18,11 @@ router.put('/:id', authMiddleware, bookController.updateBook);
 
 // Fshi libër (duhet të jesh i loguar)
 router.delete('/:id', authMiddleware, bookController.deleteBook);
+
+// Download PDF i librit (publik)
+router.get('/download/:id', bookController.downloadBookPdf);
+
+// Upload PDF për libër (duhet të jesh i loguar)
+router.post('/upload-pdf/:id', authMiddleware, upload.single('pdf'), bookController.uploadBookPdf);
 
 module.exports = router;

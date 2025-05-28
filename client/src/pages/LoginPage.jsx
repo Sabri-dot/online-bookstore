@@ -1,65 +1,5 @@
 import React, { useState } from 'react';
-
-const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Validimi bazik
-    if (!email.includes('@')) {
-      setError('Email-i nuk është i saktë.');
-      return;
-    }
-    if (password.length < 6) {
-      setError('Fjalëkalimi duhet të jetë të paktën 6 karaktere.');
-      return;
-    }
-    setError('');
-    // Këtu do thërras API për login
-    console.log('Login me', email, password);
-  };
-
-  return (
-    <div style={styles.container}>
-      <form style={styles.form} onSubmit={handleSubmit}>
-        {/* Titulli i projektit */}
-        <h1 style={styles.projectTitle}>Online Book Store</h1>
-        {/* Nën-titulli */}
-        <h2 style={styles.subtitle}>Kyçu në llogarinë tënde</h2>
-
-        <input
-          style={styles.input}
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          required
-        />
-        <input
-          style={styles.input}
-          type="password"
-          placeholder="Fjalëkalim"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          required
-        />
-        {error && <div style={styles.error}>{error}</div>}
-        <button style={styles.button} type="submit">Kyçu</button>
-        <p style={styles.text}>
-          Nuk ke llogari? <a href="/register" style={styles.link}>Regjistrohu këtu</a>
-        </p>
-        <div style={styles.socialContainer}>
-          {/* Vetëm butoni Google mbetet */}
-          <button style={{ ...styles.socialBtn, backgroundColor: '#db4437' }}>
-            Kyçu me Google
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-};
+import { useNavigate } from 'react-router-dom';
 
 const styles = {
   container: {
@@ -109,6 +49,9 @@ const styles = {
     cursor: 'pointer',
     transition: 'background-color 0.3s',
   },
+  buttonHover: {
+    backgroundColor: '#155ab6',
+  },
   error: {
     color: 'red',
     marginBottom: 16,
@@ -123,21 +66,80 @@ const styles = {
     color: '#1877F2',
     textDecoration: 'none',
   },
-  socialContainer: {
-    marginTop: 24,
-    display: 'flex',
-    justifyContent: 'center', // qendërsojmë butonin Google
-  },
-  socialBtn: {
-    flex: 'none',
-    padding: 10,
-    borderRadius: 4,
-    color: '#fff',
-    border: 'none',
-    cursor: 'pointer',
-    width: 150,
-    fontWeight: 'bold',
-  },
+};
+
+const LoginPage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!email.includes('@')) {
+      setError('Email-i nuk është i saktë.');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Fjalëkalimi duhet të jetë të paktën 6 karaktere.');
+      return;
+    }
+
+    setError('');
+
+    try {
+      const response = await fetch('http://localhost:5001/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || 'Gabim gjatë login.');
+        return;
+      }
+
+      localStorage.setItem('token', data.token);
+      navigate('/'); // ose '/add-book'
+
+    } catch (err) {
+      setError('Gabim gjatë lidhjes me serverin.');
+    }
+  };
+
+  return (
+    <div style={styles.container}>
+      <form style={styles.form} onSubmit={handleSubmit}>
+        <h1 style={styles.projectTitle}>Online Book Store</h1>
+        <h2 style={styles.subtitle}>Kyçu në llogarinë tënde</h2>
+
+        <input
+          style={styles.input}
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+        />
+        <input
+          style={styles.input}
+          type="password"
+          placeholder="Fjalëkalim"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+        />
+        {error && <div style={styles.error}>{error}</div>}
+        <button style={styles.button} type="submit">Kyçu</button>
+        <p style={styles.text}>
+          Nuk ke llogari? <a href="/register" style={styles.link}>Regjistrohu këtu</a>
+        </p>
+      </form>
+    </div>
+  );
 };
 
 export default LoginPage;

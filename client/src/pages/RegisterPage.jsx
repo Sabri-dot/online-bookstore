@@ -1,14 +1,22 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterPage = () => {
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Validimi bazik
+
+    if (!username.trim()) {
+      setError('Ju lutem shkruani username.');
+      return;
+    }
     if (!email.includes('@')) {
       setError('Email-i nuk është i saktë.');
       return;
@@ -21,19 +29,53 @@ const RegisterPage = () => {
       setError('Fjalëkalimet nuk përputhen.');
       return;
     }
+
     setError('');
-    // Këtu do thërras API për regjistrim
-    console.log('Regjistrim me', email, password);
+    setSuccess('');
+
+    try {
+      const response = await fetch('http://localhost:5001/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || 'Gabim gjatë regjistrimit.');
+        return;
+      }
+
+      setSuccess('Regjistrimi u krye me sukses! Ju lutem kyçu.');
+      setUsername('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+
+    } catch (err) {
+      setError('Gabim gjatë lidhjes me serverin.');
+    }
   };
 
   return (
     <div style={styles.container}>
       <form style={styles.form} onSubmit={handleSubmit}>
-        {/* Titulli i projektit */}
         <h1 style={styles.projectTitle}>Online Book Store</h1>
-        {/* Nën-titulli */}
-        <h2 style={styles.subtitle}>Krijo një llogari të re</h2>
+        <h2 style={styles.subtitle}>Regjistrohu</h2>
 
+        <input
+          style={styles.input}
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
+          required
+        />
         <input
           style={styles.input}
           type="email"
@@ -59,9 +101,10 @@ const RegisterPage = () => {
           required
         />
         {error && <div style={styles.error}>{error}</div>}
+        {success && <div style={styles.success}>{success}</div>}
         <button style={styles.button} type="submit">Regjistrohu</button>
         <p style={styles.text}>
-          Ke llogari? <a href="/login" style={styles.link}>Kyqu këtu</a>
+          Ke llogari? <a href="/login" style={styles.link}>Kyçu këtu</a>
         </p>
       </form>
     </div>
@@ -70,64 +113,43 @@ const RegisterPage = () => {
 
 const styles = {
   container: {
-    height: '100vh',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f2f5',
+    display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh',
+    backgroundColor: '#f2f2f2',
   },
   form: {
-    backgroundColor: '#fff',
-    padding: 40,
-    borderRadius: 8,
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    width: 350,
-    display: 'flex',
-    flexDirection: 'column',
+    backgroundColor: '#fff', padding: 30, borderRadius: 8,
+    boxShadow: '0 0 10px rgba(0,0,0,0.1)', width: 320,
+    display: 'flex', flexDirection: 'column', alignItems: 'center',
   },
   projectTitle: {
-    marginBottom: 4,
-    textAlign: 'center',
-    color: '#1877F2',
-    fontWeight: 'bold',
-    fontSize: 28,
+    marginBottom: 10,
+    color: '#333',
   },
   subtitle: {
-    marginBottom: 24,
-    textAlign: 'center',
-    color: '#555',
-    fontWeight: '500',
+    marginBottom: 20,
+    color: '#666',
   },
   input: {
-    padding: 12,
-    marginBottom: 16,
-    borderRadius: 4,
-    border: '1px solid #ccc',
-    fontSize: 16,
+    width: '100%', padding: 10, marginBottom: 15,
+    borderRadius: 4, border: '1px solid #ccc', fontSize: 16,
   },
   button: {
-    padding: 12,
-    borderRadius: 4,
-    border: 'none',
-    backgroundColor: '#1877F2',
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-    cursor: 'pointer',
-    transition: 'background-color 0.3s',
+    width: '100%', padding: 10, backgroundColor: '#4CAF50',
+    color: 'white', border: 'none', borderRadius: 4,
+    cursor: 'pointer', fontSize: 16,
   },
   error: {
-    color: 'red',
-    marginBottom: 16,
-    textAlign: 'center',
+    color: 'red', marginBottom: 10,
+  },
+  success: {
+    color: 'green', marginBottom: 10,
   },
   text: {
-    marginTop: 16,
-    textAlign: 'center',
-    fontSize: 14,
+    marginTop: 15,
+    color: '#555',
   },
   link: {
-    color: '#1877F2',
+    color: '#4CAF50',
     textDecoration: 'none',
   },
 };

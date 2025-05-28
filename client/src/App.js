@@ -7,6 +7,9 @@ import RegisterPage from './pages/RegisterPage';
 import BooksPage from './pages/BooksPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
+import BookDetails from './pages/BookDetails';
+import AddBook from './pages/AddBook';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -20,6 +23,15 @@ function App() {
           <Route path="/books" element={<BooksPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/books/:id" element={<BookDetails />} />
+          <Route
+            path="/add-book"
+            element={
+              <ProtectedRoute>
+                <AddBook />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </>
     </Router>
@@ -27,4 +39,3 @@ function App() {
 }
 
 export default App;
-
