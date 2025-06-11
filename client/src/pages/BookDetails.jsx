@@ -10,7 +10,7 @@ const BookDetails = () => {
 
   useEffect(() => {
     getBookById(id)
-      .then((res) => {
+      .then(res => {
         setBook(res.data);
         setLoading(false);
       })
@@ -24,25 +24,15 @@ const BookDetails = () => {
   if (error) return <p>{error}</p>;
 
   return (
-    <div>
+    <div style={{ maxWidth: 600, margin: '20px auto', padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', borderRadius: 8 }}>
       <h2>{book.title}</h2>
-      <p>Author: {book.author}</p>
-      <p>Description: {book.description}</p>
-      <p>Price: {book.price} USD</p>
-      
-      {book.file_url && (
-        <p>
-          <a
-            href={`http://localhost:5001/pdfs/${book.file_url}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Lexo PDF
-          </a>
-        </p>
-      )}
+      <p><strong>Author:</strong> {book.author}</p>
+      <p><strong>Description:</strong> {book.description}</p>
+      <p><strong>Price:</strong> ${book.price.toFixed(2)} USD</p>
 
-      <Link to="/">Kthehu në Listën e Librave</Link>
+      <Link to="/books" style={{ display: 'inline-block', marginTop: 20, color: '#1877F2', textDecoration: 'underline' }}>
+        Kthehu në Listën e Librave
+      </Link>
     </div>
   );
 };

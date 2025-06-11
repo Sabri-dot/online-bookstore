@@ -7,6 +7,7 @@ import RegisterPage from './pages/RegisterPage';
 import BooksPage from './pages/BooksPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
+import BooksList from './components/BooksList';
 import BookDetails from './pages/BookDetails';
 import AddBook from './pages/AddBook';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -20,6 +21,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/books/:id" element={<BookDetails />} />
           <Route path="/books" element={<BooksPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />

@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
-  
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState('JohnDoe'); 
+  const [username, setUsername] = useState('JohnDoe');
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
   const handleLogout = () => {
-   
     setIsLoggedIn(false);
     setDropdownOpen(false);
     console.log('User logged out');
@@ -18,12 +16,10 @@ const Navbar = () => {
 
   return (
     <nav style={styles.navbar}>
-      {/* Logo / Emri i projektit */}
       <Link to="/" style={styles.logo}>
         Online Book Store
       </Link>
 
-      {/* Lidhjet kryesore */}
       <div style={styles.navLinks}>
         <Link to="/" style={styles.link}>Home</Link>
         <Link to="/books" style={styles.link}>Librat</Link>
@@ -31,7 +27,6 @@ const Navbar = () => {
         <Link to="/contact" style={styles.link}>Kontakt</Link>
       </div>
 
-      {/* Kontrolli i llogarisë */}
       <div style={styles.authSection}>
         {!isLoggedIn ? (
           <>
@@ -41,7 +36,7 @@ const Navbar = () => {
         ) : (
           <div style={styles.userMenu}>
             <div onClick={toggleDropdown} style={styles.username}>
-              {username} &#x25BC; {/* shigjeta poshtë */}
+              {username} &#x25BC;
             </div>
             {dropdownOpen && (
               <div style={styles.dropdown}>
@@ -63,7 +58,7 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '10px 20px',
-    backgroundColor: '#1877F2', 
+    backgroundColor: '#1877F2',
     color: 'white',
     position: 'sticky',
     top: 0,
