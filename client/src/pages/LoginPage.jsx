@@ -49,9 +49,6 @@ const styles = {
     cursor: 'pointer',
     transition: 'background-color 0.3s',
   },
-  buttonHover: {
-    backgroundColor: '#155ab6',
-  },
   error: {
     color: 'red',
     marginBottom: 16,
@@ -102,9 +99,11 @@ const LoginPage = () => {
         return;
       }
 
+      // Ruaj token dhe user info në localStorage
       localStorage.setItem('token', data.token);
-      navigate('/'); // ose '/add-book'
+      localStorage.setItem('user', JSON.stringify(data.user));
 
+      navigate('/'); // ose te faqja që dëshiron pas login
     } catch (err) {
       setError('Gabim gjatë lidhjes me serverin.');
     }
@@ -132,8 +131,11 @@ const LoginPage = () => {
           onChange={e => setPassword(e.target.value)}
           required
         />
+
         {error && <div style={styles.error}>{error}</div>}
+
         <button style={styles.button} type="submit">Kyçu</button>
+
         <p style={styles.text}>
           Nuk ke llogari? <a href="/register" style={styles.link}>Regjistrohu këtu</a>
         </p>

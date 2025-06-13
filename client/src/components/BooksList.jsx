@@ -1,75 +1,139 @@
 import React, { useEffect, useState } from 'react';
 import { getBooks } from '../services/bookService';
-import { Link } from 'react-router-dom';
+import PaymentModal from './PaymentModal';
+import { toast } from 'react-toastify';
+import { Howl } from 'howler';
+import 'react-toastify/dist/ReactToastify.css';
+
+const successSound = new Howl({
+  src: ['https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg'],
+  volume: 0.5,
+});
 
 const BooksList = () => {
   const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     getBooks()
-      .then(res => {
-        setBooks(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError('Gabim në marrjen e librave.');
-        setLoading(false);
-      });
+      .then((res) => setBooks(res.data))
+      .catch(() => toast.error('❌ Dështoi ngarkimi i librave.'));
   }, []);
 
-  if (loading) return <p>Loading librat...</p>;
-  if (error) return <p>{error}</p>;
+  const handleBuyClick = (book) => {
+    setSelectedBook(book);
+    setShowModal(true);
+  };
+
+  const handleConfirmPayment = async (paymentInfo) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast.warning('🔒 Ju lutemi kyçuni për të bërë blerje.');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:5001/api/purchases', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ book_id: selectedBook.id }),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok || !data) {
+        toast.error(data?.message || '❌ Dështoi blerja.');
+      } else {
+        toast.success('✅ Blerja u krye me sukses! 📘');
+        successSound.play();
+        setShowModal(false);
+        setSelectedBook(null);
+      }
+    } catch (error) {
+      console.error('Gabim:', error);
+      toast.error('❌ Gabim gjatë lidhjes me serverin.');
+    }
+  };
 
   return (
-    <div>
-      <h2>Libra në Shitje</h2>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
-        {books.map(book => (
-          <div
-            key={book.id}
-            style={{
-              width: 200,
-              border: '1px solid #ccc',
-              borderRadius: 8,
-              padding: 16,
-              textAlign: 'center',
-              boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-            }}
-          >
-            <img
-              src={book.image_url}
-              alt={book.title}
-              style={{ width: '100%', height: 280, objectFit: 'cover', borderRadius: 4 }}
-            />
-            <h3>{book.title}</h3>
-            <p>Autor: {book.author}</p>
-           <p>Çmimi: ${book.price ? Number(book.price).toFixed(2) : 'N/A'}</p>
-
-
-            <Link to={`/books/${book.id}`} style={{ display: 'block', margin: '12px 0' }}>
-              Detaje
-            </Link>
-
-            <button
-              onClick={() => alert(`Shto në shportë: ${book.title}`)}
-              style={{
-                padding: '8px 12px',
-                background: '#1877F2',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 4,
-                cursor: 'pointer',
-              }}
-            >
-              Shto në Shportë
-            </button>
+    <div className="books-container" style={styles.container}>
+      <h2 style={styles.title}>📚 Librat në dispozicion</h2>
+      <div style={styles.grid}>
+        {books.map((book) => (
+          <div key={book.id} style={styles.card}>
+            <img src={book.image_url} alt={book.title} style={styles.image} />
+            <h3 style={styles.bookTitle}>{book.title}</h3>
+            <p><strong>Autori:</strong> {book.author}</p>
+            <p><strong>Çmimi:</strong> {book.price} €</p>
+            <p style={styles.description}>{book.description}</p>
+            <button style={styles.button} onClick={() => handleBuyClick(book)}>🛒 Bli</button>
           </div>
         ))}
       </div>
+
+      {showModal && selectedBook && (
+        <PaymentModal
+          book={selectedBook}
+          onClose={() => setShowModal(false)}
+          onConfirm={handleConfirmPayment}
+        />
+      )}
     </div>
   );
+};
+
+
+const styles = {
+  container: {
+    padding: '2rem',
+    maxWidth: '1200px',
+    margin: '0 auto',
+  },
+  title: {
+    textAlign: 'center',
+    marginBottom: '2rem',
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+    gap: '1.5rem',
+  },
+  card: {
+    border: '1px solid #ccc',
+    borderRadius: '12px',
+    padding: '1rem',
+    backgroundColor: '#fff',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+    textAlign: 'center',
+  },
+  image: {
+    maxWidth: '100%',
+    height: '180px',
+    objectFit: 'cover',
+    borderRadius: '8px',
+  },
+  bookTitle: {
+    fontSize: '1.2rem',
+    margin: '0.5rem 0',
+  },
+  description: {
+    fontSize: '0.9rem',
+    color: '#555',
+  },
+  button: {
+    backgroundColor: '#4caf50',
+    color: '#fff',
+    border: 'none',
+    padding: '0.6rem 1.2rem',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    marginTop: '1rem',
+    transition: 'background 0.3s',
+  },
 };
 
 export default BooksList;

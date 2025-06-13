@@ -11,6 +11,8 @@ import BooksList from './components/BooksList';
 import BookDetails from './pages/BookDetails';
 import AddBook from './pages/AddBook';
 import ProtectedRoute from './components/ProtectedRoute';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
@@ -25,7 +27,6 @@ function App() {
           <Route path="/books" element={<BooksPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/books/:id" element={<BookDetails />} />
           <Route
             path="/add-book"
             element={
@@ -35,6 +36,20 @@ function App() {
             }
           />
         </Routes>
+
+        {  }
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
       </>
     </Router>
   );
