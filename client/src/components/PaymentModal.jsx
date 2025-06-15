@@ -27,7 +27,7 @@ const PaymentModal = ({ book, onClose, onConfirm }) => {
         <form onSubmit={handleSubmit} style={styles.form}>
           <input
             type="text"
-            placeholder="💳 Numri i kartës (16 shifra)"
+            placeholder="💳 Numri i kartës "
             value={cardNumber}
             onChange={(e) => setCardNumber(e.target.value)}
             required
@@ -42,26 +42,26 @@ const PaymentModal = ({ book, onClose, onConfirm }) => {
             required
             style={styles.input}
           />
-          <div style={styles.row}>
-            <input
-              type="text"
-              placeholder="📅 Skadenca (MM/YY)"
-              value={expiry}
-              onChange={(e) => setExpiry(e.target.value)}
-              required
-              style={{ ...styles.input, flex: 1 }}
-              maxLength={5}
-            />
-            <input
-              type="text"
-              placeholder="🔒 CVV"
-              value={cvv}
-              onChange={(e) => setCvv(e.target.value)}
-              required
-              style={{ ...styles.input, flex: 1, marginLeft: 8 }}
-              maxLength={3}
-            />
-          </div>
+       <div style={styles.row}>
+  <input
+    type="text"
+    placeholder="📅 Skadenca (MM/YY)"
+    value={expiry}
+    onChange={(e) => setExpiry(e.target.value)}
+    required
+    style={{ ...styles.input, flex: 1 }}
+    maxLength={5}
+  />
+  <input
+    type="text"
+    placeholder="🔒 CVV"
+    value={cvv}
+    onChange={(e) => setCvv(e.target.value)}
+    required
+    style={{ ...styles.input, flex: 0.5, minWidth: 80 }}
+    maxLength={3}
+  />
+</div>
           <input
             type="password"
             placeholder="🔑 Fjalëkalimi për verifikim"

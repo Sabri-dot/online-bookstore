@@ -3,6 +3,7 @@ import { getBooks } from '../services/bookService';
 import PaymentModal from './PaymentModal';
 import { toast } from 'react-toastify';
 import { Howl } from 'howler';
+import CommentsSection from './CommentsList';
 import 'react-toastify/dist/ReactToastify.css';
 
 const successSound = new Howl({
@@ -14,12 +15,37 @@ const BooksList = () => {
   const [books, setBooks] = useState([]);
   const [selectedBook, setSelectedBook] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [purchasedBookIds, setPurchasedBookIds] = useState([]);
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
+    loadBooks();
+    if (token) loadPurchasedBooks();
+  }, [token]);
+
+  const loadBooks = () => {
     getBooks()
       .then((res) => setBooks(res.data))
       .catch(() => toast.error('❌ Dështoi ngarkimi i librave.'));
-  }, []);
+  };
+
+  const loadPurchasedBooks = () => {
+    fetch('http://localhost:5001/api/purchases/user-books', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log("Librat e blerë:", data);
+        const purchasedIds = data.map(b => b.book_id);
+        setPurchasedBookIds(purchasedIds);
+      })
+      .catch((error) => {
+        console.error("Gabim gjatë marrjes së librave të blerë:", error);
+        toast.error('❌ Dështoi marrja e librave të blerë.');
+      });
+  };
 
   const handleBuyClick = (book) => {
     setSelectedBook(book);
@@ -27,7 +53,6 @@ const BooksList = () => {
   };
 
   const handleConfirmPayment = async (paymentInfo) => {
-    const token = localStorage.getItem('token');
     if (!token) {
       toast.warning('🔒 Ju lutemi kyçuni për të bërë blerje.');
       return;
@@ -52,6 +77,7 @@ const BooksList = () => {
         successSound.play();
         setShowModal(false);
         setSelectedBook(null);
+        loadPurchasedBooks();
       }
     } catch (error) {
       console.error('Gabim:', error);
@@ -71,6 +97,13 @@ const BooksList = () => {
             <p><strong>Çmimi:</strong> {book.price} €</p>
             <p style={styles.description}>{book.description}</p>
             <button style={styles.button} onClick={() => handleBuyClick(book)}>🛒 Bli</button>
+
+            {/* Shfaq komentet gjithmonë dhe forma për shtim vetëm për librat e blerë */}
+            <CommentsSection
+              bookId={book.id}
+              isPurchased={purchasedBookIds.includes(Number(book.id))}
+              token={token}
+            />
           </div>
         ))}
       </div>
@@ -85,7 +118,6 @@ const BooksList = () => {
     </div>
   );
 };
-
 
 const styles = {
   container: {
