@@ -1,28 +1,20 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const commentSchema = new mongoose.Schema({
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    type: String,  // ndrysho nga ObjectId në String nëse userId nuk është ObjectId
     required: true,
   },
   bookId: {
-    type: Number, // nëse librat ruhen në MySQL me ID numerik
+    type: String,  // po ashtu
     required: true,
   },
   commentText: {
     type: String,
     required: true,
   },
-  rating: {
-    type: Number, // nga 1 deri në 5 yje
-    min: 1,
-    max: 5,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  }
-});
+  rating: Number,
+  isAnonymous: Boolean,
+}, { timestamps: true });
 
-module.exports = mongoose.model("Comment", commentSchema);
+module.exports = mongoose.model('Comment', commentSchema);

@@ -18,10 +18,10 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-const authRoutes = require('./routes/auth');     // users (MySQL)
-const commentRoutes = require('./routes/commentRoutes'); // comments (MongoDB)
-const logRoutes = require('./routes/logRoutes');         // logs (MongoDB)
-const bookRoutes = require('./routes/bookRoutes');       // librat (MySQL)
+const authRoutes = require('./routes/auth');       // për users (MySQL)
+const commentRoutes = require('./routes/commentRoutes'); // për comments (MongoDB)
+const logRoutes = require('./routes/logRoutes');           // për logs (MongoDB)
+const bookRoutes = require('./routes/bookRoutes');         // librat (MySQL)
 const purchaseRoutes = require('./routes/purchaseRoutes'); // porositë (MySQL)
 
 app.use('/api/auth', authRoutes);
