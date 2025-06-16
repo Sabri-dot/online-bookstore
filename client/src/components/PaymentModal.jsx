@@ -9,11 +9,11 @@ const PaymentModal = ({ book, onClose, onConfirm }) => {
   const [password, setPassword] = useState('');
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const paymentInfo = { cardNumber, cardName, expiry, cvv, password };
-    onConfirm(paymentInfo);
-  };
+  const paymentInfo = { cardNumber, cardName, expiry, cvv, password };
+  onConfirm(paymentInfo); 
+};
 
   return (
     <div style={styles.overlay}>

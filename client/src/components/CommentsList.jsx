@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { getCommentsByBook, addComment, editComment } from '../services/commentService';
 
 const CommentsList = ({ bookId, isPurchased, token, currentUser }) => {
   const [comments, setComments] = useState([]);
@@ -14,22 +13,22 @@ const CommentsList = ({ bookId, isPurchased, token, currentUser }) => {
   const [displayName, setDisplayName] = useState('');
   const [editingCommentId, setEditingCommentId] = useState(null);
 
-  useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        setLoading(true);
-        const res = await getCommentsByBook(bookId);
-        setComments(res.data);
-      } catch (err) {
-        console.error('Gabim gjatë marrjes së komenteve:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchComments = async () => {
+    if (!bookId) return;
+    try {
+      setLoading(true);
+      const res = await axios.get(`http://localhost:5001/api/comments/${bookId}`);
+      setComments(res.data);
+    } catch (err) {
+      console.error('Gabim gjatë marrjes së komenteve:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (bookId) fetchComments();
 
-    // Pas ndryshimit të librarit, pastro formën
     setCommentText('');
     setRating(5);
     setIsAnonymous(false);
@@ -38,74 +37,81 @@ const CommentsList = ({ bookId, isPurchased, token, currentUser }) => {
     setError('');
   }, [bookId]);
 
+  useEffect(() => {
+    if (showComments && bookId) {
+      fetchComments(); // ky është shtimi i vetëm që bëra
+    }
+  }, [showComments]);
+
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!commentText.trim()) {
-    setError('Ju lutem shkruani koment.');
-    return;
-  }
-  if (rating < 1 || rating > 5) {
-    setError('Vlerësimi duhet të jetë nga 1 deri në 5.');
-    return;
-  }
-  if (!isAnonymous && displayName.trim() === '') {
-    setError('Ju lutem shkruani emrin tuaj ose aktivizoni anonimitetin.');
-    return;
-  }
-
-  setError('');
-  setAddingComment(true);
-
-  try {
-    const commentData = {
-      bookId,
-      commentText,
-      rating,
-      isAnonymous,
-      displayName: isAnonymous ? '' : displayName.trim(),
-    };
-
-    let res;
-    if (editingCommentId) {
-      // PUT request with the comment ID in URL
-      res = await axios.put(
-        `http://localhost:5001/api/comments/${editingCommentId}`,
-        commentData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      setComments((prev) =>
-        prev.map((c) => (c._id === editingCommentId ? res.data : c))
-      );
-      setEditingCommentId(null);
-    } else {
-      // POST request for new comment
-      res = await axios.post(
-        'http://localhost:5001/api/comments',
-        commentData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setComments((prev) => [...prev, res.data]);
+    if (!commentText.trim()) {
+      setError('Ju lutem shkruani koment.');
+      return;
+    }
+    if (rating < 1 || rating > 5) {
+      setError('Vlerësimi duhet të jetë nga 1 deri në 5.');
+      return;
+    }
+    if (!isAnonymous && displayName.trim() === '') {
+      setError('Ju lutem shkruani emrin tuaj ose aktivizoni anonimitetin.');
+      return;
     }
 
-    // Reset form
-    setCommentText('');
-    setRating(5);
-    setIsAnonymous(false);
-    setDisplayName('');
-  } catch (err) {
-    console.error('Gabim gjatë shtimit/editimit të komentit:', err);
-    setError('Gabim gjatë dërgimit të komentit.');
-  } finally {
-    setAddingComment(false);
-  }
-};
+    setError('');
+    setAddingComment(true);
+
+    try {
+      const commentData = {
+        bookId,
+        commentText,
+        rating,
+        isAnonymous,
+        displayName: isAnonymous ? '' : displayName.trim(),
+      };
+
+      let res;
+      if (editingCommentId) {
+        res = await axios.put(
+          `http://localhost:5001/api/comments/${editingCommentId}`,
+          commentData,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        setComments((prev) =>
+          prev.map((c) => (c._id === editingCommentId ? res.data.comment : c))
+        );
+        setEditingCommentId(null);
+      } else {
+        res = await axios.post(
+          'http://localhost:5001/api/comments',
+          commentData,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setComments((prev) => [...prev, res.data.comment]);
+      }
+
+      setCommentText('');
+      setRating(5);
+      setIsAnonymous(false);
+      setDisplayName('');
+    } catch (err) {
+  console.error('Gabim gjatë shtimit/editimit të komentit:', err);
+  console.log('Error response:', err.response?.data);
+  setError(
+    err.response?.data?.message ||
+    'Gabim gjatë dërgimit të komentit.'
+  );
+    } finally {
+      setAddingComment(false);
+    }
+  };
 
   const handleEditClick = (comment) => {
     setEditingCommentId(comment._id);
-    setCommentText(comment.commentText);
-    setRating(comment.rating);
+    setCommentText(comment.commentText || '');
+    setRating(comment.rating || 5);
     setIsAnonymous(comment.isAnonymous || false);
     setDisplayName(comment.displayName || '');
     setError('');
@@ -147,15 +153,17 @@ const CommentsList = ({ bookId, isPurchased, token, currentUser }) => {
                       ? 'Përdorues Anonim'
                       : comment.displayName && comment.displayName.trim() !== ''
                       ? comment.displayName
-                      : comment.userId?.name || 'Pa Emër'}
+                      : currentUser && comment.userId && currentUser._id === comment.userId._id
+                      ? currentUser.name || 'Pa Emër'
+                      : 'Pa Emër'}
                     :
                   </strong>{' '}
                   {comment.commentText}
                   <br />
-                  <em>Vlerësimi: {comment.rating} / 5</em>
+                  <em>Vlerësimi: {comment.rating || 'Nuk është dhënë'} / 5</em>
                 </div>
 
-                {isPurchased && currentUser?._id === comment.userId?._id && (
+                {isPurchased && currentUser && comment.userId && currentUser._id === comment.userId._id && (
                   <button
                     className="btn btn-sm btn-outline-primary"
                     onClick={() => handleEditClick(comment)}
