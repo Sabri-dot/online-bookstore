@@ -7,7 +7,11 @@ const pool = require('./models/db');  // MySQL connection pool
 const purchaseRoutes = require('./routes/purchaseRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const authRoutes = require('./routes/auth');
-
+const adminBooksRoutes = require('./routes/admin/books');
+const adminGenresRoutes = require('./routes/admin/genres');
+const adminUsersRoutes = require('./routes/admin/users');
+const adminCommentsRoutes = require('./routes/admin/comments');
+const adminPurchasesRoutes = require('./routes/admin/purchases');
 dotenv.config();
 
 const app = express();
@@ -67,6 +71,11 @@ app.get('/api/books/genre/:genreName', async (req, res) => {
 // API routes
 app.use('/api/purchases', purchaseRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/admin/books', adminBooksRoutes);
+app.use('/api/admin/genres', adminGenresRoutes);
+app.use('/api/admin/users', adminUsersRoutes);
+app.use('/api/admin/comments', adminCommentsRoutes);
+app.use('/api/admin/purchases', adminPurchasesRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

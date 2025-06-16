@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 
 exports.register = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, role } = req.body; // merr role nga frontend
 
   if (!username || !email || !password) {
     return res.status(400).json({ message: 'Të gjitha fushat janë të detyrueshme.' });
@@ -21,10 +21,10 @@ exports.register = async (req, res) => {
     // Hash fjalëkalimin
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Shto përdoruesin
+    // Shto përdoruesin me rolin (nëse nuk jepet, default 'user')
     await pool.execute(
-      'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
-      [username, email, hashedPassword]
+      'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
+      [username, email, hashedPassword, role || 'user']
     );
 
     res.status(201).json({ message: 'Regjistrimi u krye me sukses.' });
@@ -56,7 +56,7 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Email ose fjalëkalimi i gabuar.' });
     }
 
-    // Gjenero token JWT
+    // Gjenero token JWT përfshirë rolin në payload
     const token = jwt.sign(
       { id: user.id, username: user.username, email: user.email, role: user.role },
       JWT_SECRET,
