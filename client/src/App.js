@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
 import Navbar from './components/NavBar';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -11,7 +12,7 @@ import ContactPage from './pages/ContactPage';
 import BooksList from './components/BooksList';
 import BookDetails from './pages/BookDetails';
 import AddBook from './pages/AddBook';
-import ProtectedRoute from './components/ProtectedRoute';
+import PrivateRoute from './components/PrivateRoute'; // importojmë PrivateRoute
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -28,17 +29,31 @@ function App() {
           <Route path="/books" element={<BooksPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+
+          {/* Shtojmë rruget private me kontroll role */}
+
+          {/* Vetëm përdorues të kyçur mund të shtojnë libra */}
           <Route
             path="/add-book"
             element={
-              <ProtectedRoute>
+              <PrivateRoute>
                 <AddBook />
-              </ProtectedRoute>
+              </PrivateRoute>
+            }
+          />
+
+          {/* Shembull: Rruga e adminit për menaxhim librash */}
+          <Route
+            path="/admin/books"
+            element={
+              <PrivateRoute allowedRoles={['admin']}>
+                {/* Nëse nuk e ke faqen AdminBooks, krijo atë, ose shtoje komponentin që menaxhon librat nga admin */}
+                <BooksList adminView={true} />
+              </PrivateRoute>
             }
           />
         </Routes>
 
-        {  }
         <ToastContainer
           position="top-right"
           autoClose={3000}

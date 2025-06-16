@@ -3,12 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
+  const [role, setRole] = useState(localStorage.getItem('role') || null);
   const navigate = useNavigate();
 
   useEffect(() => {
     // Ndjek ndryshimet në localStorage në tab të ndryshëm
     const handleStorageChange = () => {
       setIsLoggedIn(!!localStorage.getItem('token'));
+      setRole(localStorage.getItem('role'));
     };
 
     window.addEventListener('storage', handleStorageChange);
@@ -16,6 +18,7 @@ const Navbar = () => {
     // Ndjek event custom 'login' për të reaguar në të njëjtin tab
     const checkLogin = () => {
       setIsLoggedIn(!!localStorage.getItem('token'));
+      setRole(localStorage.getItem('role'));
     };
     window.addEventListener('login', checkLogin);
 
@@ -28,7 +31,9 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
+    localStorage.removeItem('role');  // KETU HEQIM EDHE ROLE
     setIsLoggedIn(false);
+    setRole(null);
     navigate('/login');
   };
 
@@ -43,6 +48,10 @@ const Navbar = () => {
         <Link to="/books" style={styles.link}>Librat</Link>
         <Link to="/about" style={styles.link}>Rreth Nesh</Link>
         <Link to="/contact" style={styles.link}>Kontakt</Link>
+        {/* Këtu shtojmë link për Admin vetëm nëse është admin */}
+        {role === 'admin' && (
+          <Link to="/admin/books" style={styles.link}>Menaxho Librat (Admin)</Link>
+        )}
       </div>
 
       <div style={styles.authSection}>
@@ -87,6 +96,7 @@ const styles = {
   navLinks: {
     display: 'flex',
     gap: 20,
+    alignItems: 'center',
   },
   link: {
     color: 'white',
@@ -117,7 +127,7 @@ const styles = {
     cursor: 'pointer',
     borderBottom: '1px solid #ddd',
     textDecoration: 'none',
-    color: 'red',  
+    color: 'red',
     fontWeight: 'bold',
   }
 };

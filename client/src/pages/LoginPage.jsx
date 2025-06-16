@@ -102,6 +102,7 @@ const LoginPage = () => {
       // Ruaj token dhe user info në localStorage
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('role', data.user.role);  // KETU SHTOJMË
 
       // Event për të sinjalizuar Navbar për login
       window.dispatchEvent(new Event('login'));
