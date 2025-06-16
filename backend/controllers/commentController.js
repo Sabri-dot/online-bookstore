@@ -2,85 +2,79 @@ const Comment = require('../models/Comment');
 const pool = require('../models/db');
 const { ObjectId } = require('mongodb');
 
-exports.getComments = async (req, res) => {
-  const { bookId } = req.params;
+exports.getCommentsByBook = async (req, res) => {
   try {
+    const { bookId } = req.params;
+
+    if (!bookId) {
+      return res.status(400).json({ message: 'bookId është i nevojshëm.' });
+    }
+
     const comments = await Comment.find({ bookId }).sort({ createdAt: -1 });
+
     res.json(comments);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Gabim gjatë marrjes së komenteve" });
+    console.error('Gabim gjatë marrjes së komenteve:', error);
+    res.status(500).json({ message: 'Gabim serveri gjatë marrjes së komenteve.' });
   }
 };
 
 exports.addComment = async (req, res) => {
-  const userId = req.user.id;
-  const { bookId, commentText, rating, isAnonymous } = req.body;
-
-  if (!bookId || !commentText) {
-    return res.status(400).json({ message: "Mungon bookId ose commentText" });
-  }
-
   try {
-    // Kontrollo në MySQL nëse përdoruesi ka blerë librin
-    const [rows] = await pool.execute(
-      'SELECT * FROM purchases WHERE user_id = ? AND book_id = ?',
-      [userId, bookId]
-    );
+    const userId = req.user.id; // supozojmë që authMiddleware vendos req.user
+    const { bookId, commentText, rating, isAnonymous } = req.body;
 
-    if (rows.length === 0) {
-      return res.status(403).json({ message: "Nuk mund të komentosh këtë libër pasi nuk e ke blerë." });
+    if (!bookId || !commentText) {
+      return res.status(400).json({ message: 'bookId dhe commentText janë të nevojshme.' });
     }
 
-    const newComment = new Comment({ userId, bookId, commentText, rating, isAnonymous: !!isAnonymous });
+    const newComment = new Comment({
+      userId,
+      bookId,
+      commentText,
+      rating,
+      isAnonymous: !!isAnonymous,
+      createdAt: new Date()
+    });
+
     await newComment.save();
 
-    res.status(201).json(newComment);
+    res.status(201).json({ message: 'Koment u shtua me sukses!', comment: newComment });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Gabim gjatë shtimit të komentit", error });
+    console.error('Gabim gjatë shtimit të komentit:', error);
+    res.status(500).json({ message: 'Gabim serveri gjatë shtimit të komentit.' });
   }
 };
 
-exports.editComment = async (req, res) => {
-  const userId = req.user.id;
-  const { commentText, rating, isAnonymous } = req.body;
-  const { commentId } = req.params; // Marrim ID nga URL
-
-  if (!commentId || !commentText) {
-    return res.status(400).json({ message: "Mungon commentId ose commentText" });
-  }
-
+exports.updateComment = async (req, res) => {
   try {
-    const comment = await Comment.findById(new ObjectId(commentId));
+    const userId = req.user.id;
+    const { commentId } = req.params;
+    const { commentText, rating, isAnonymous } = req.body;
 
-    if (!comment) {
-      return res.status(404).json({ message: "Koment nuk u gjet" });
+    if (!commentText) {
+      return res.status(400).json({ message: 'commentText i ri është i nevojshëm.' });
     }
 
-    if (comment.userId.toString() !== userId.toString()) {
-      return res.status(403).json({ message: "Nuk ke leje të modifikosh këtë koment" });
+    const existingComment = await Comment.findById(commentId);
+
+    if (!existingComment) {
+      return res.status(404).json({ message: 'Koment nuk u gjet.' });
     }
 
-    // Kontrollo në MySQL nëse ka blerje për librin
-    const [rows] = await pool.execute(
-      'SELECT * FROM purchases WHERE user_id = ? AND book_id = ?',
-      [userId, comment.bookId]
-    );
-    if (rows.length === 0) {
-      return res.status(403).json({ message: "Nuk mund të modifikosh koment për libër të pa blerë" });
+    if (existingComment.userId !== userId) {
+      return res.status(403).json({ message: 'Nuk ke leje për të ndryshuar këtë koment.' });
     }
 
-    comment.commentText = commentText;
-    comment.rating = rating || comment.rating;
-    comment.isAnonymous = !!isAnonymous;
+    existingComment.commentText = commentText;
+    if (rating !== undefined) existingComment.rating = rating;
+    existingComment.isAnonymous = !!isAnonymous;
 
-    await comment.save();
+    await existingComment.save();
 
-    res.json(comment);
+    res.json({ message: 'Koment u përditësua me sukses!', comment: existingComment });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Gabim gjatë modifikimit të komentit", error });
+    console.error('Gabim gjatë përditësimit të komentit:', error);
+    res.status(500).json({ message: 'Gabim serveri gjatë përditësimit të komentit.' });
   }
 };
-

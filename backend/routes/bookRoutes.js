@@ -1,28 +1,35 @@
 const express = require('express');
 const router = express.Router();
-const bookController = require('../controllers/bookController');
-const authMiddleware = require('../middlewares/authMiddleware'); // JWT verifikim
-const upload = require('../middlewares/uploadMiddleware'); // multer për upload
+const pool = require('../models/db');
 
-// Lexo librat (publik)
-router.get('/', bookController.getAllBooks);
+// GET /api/books - Merr të gjithë librat
+router.get('/', async (req, res) => {
+  try {
+    const [rows] = await pool.execute('SELECT * FROM books ORDER BY created_at DESC');
+    res.json(rows);
+  } catch (error) {
+    console.error('Gabim gjatë marrjes së librave:', error);
+    res.status(500).json({ message: 'Gabim në server gjatë marrjes së librave' });
+  }
+});
 
-// Merr libër sipas id (publik)
-router.get('/:id', bookController.getBookById);
+// GET /api/books/genre/:genreName - Merr librat sipas zhanrit
+router.get('/genre/:genreName', async (req, res) => {
+  const { genreName } = req.params;
 
-// Shto libër (duhet të jesh i loguar)
-router.post('/', authMiddleware, bookController.createBook);
-
-// Përditëso libër (duhet të jesh i loguar)
-router.put('/:id', authMiddleware, bookController.updateBook);
-
-// Fshi libër (duhet të jesh i loguar)
-router.delete('/:id', authMiddleware, bookController.deleteBook);
-
-// Download PDF i librit (publik)
-router.get('/download/:id', bookController.downloadBookPdf);
-
-// Upload PDF për libër (duhet të jesh i loguar)
-router.post('/upload-pdf/:id', authMiddleware, upload.single('pdf'), bookController.uploadBookPdf);
+  try {
+    const [rows] = await pool.execute(
+      `SELECT b.* FROM books b
+       JOIN book_genres bg ON b.id = bg.book_id
+       JOIN genres g ON g.id = bg.genre_id
+       WHERE g.name = ?`,
+      [genreName]
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error('Gabim gjatë filtrimit të librave:', error);
+    res.status(500).json({ message: 'Gabim në server gjatë filtrimit të librave' });
+  }
+});
 
 module.exports = router;
