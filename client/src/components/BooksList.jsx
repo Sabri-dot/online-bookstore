@@ -11,14 +11,14 @@ const successSound = new Howl({
 });
 
 const SearchBar = ({ searchTerm, setSearchTerm }) => (
-  <div className="input-group" style={{ maxWidth: '300px' }}>
+  <div className="input-group" style={{ maxWidth: '500px', width: '100%' }}>
     <span className="input-group-text bg-light">
       <i className="fas fa-search"></i>
     </span>
     <input
       type="text"
       className="form-control"
-      placeholder="Kërko librat sipas titullit apo autorit"
+      placeholder="Kërko titull ose autor..."
       value={searchTerm}
       onChange={(e) => setSearchTerm(e.target.value)}
     />

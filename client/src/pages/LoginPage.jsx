@@ -103,7 +103,10 @@ const LoginPage = () => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
-      navigate('/'); // ose te faqja që dëshiron pas login
+      // Event për të sinjalizuar Navbar për login
+      window.dispatchEvent(new Event('login'));
+
+      navigate('/'); // Redirect pas login
     } catch (err) {
       setError('Gabim gjatë lidhjes me serverin.');
     }

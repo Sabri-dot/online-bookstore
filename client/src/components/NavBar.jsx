@@ -1,17 +1,35 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState('JohnDoe');
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
+  const navigate = useNavigate();
 
-  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+  useEffect(() => {
+    // Ndjek ndryshimet në localStorage në tab të ndryshëm
+    const handleStorageChange = () => {
+      setIsLoggedIn(!!localStorage.getItem('token'));
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    // Ndjek event custom 'login' për të reaguar në të njëjtin tab
+    const checkLogin = () => {
+      setIsLoggedIn(!!localStorage.getItem('token'));
+    };
+    window.addEventListener('login', checkLogin);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('login', checkLogin);
+    };
+  }, []);
 
   const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
     setIsLoggedIn(false);
-    setDropdownOpen(false);
-    console.log('User logged out');
+    navigate('/login');
   };
 
   return (
@@ -35,16 +53,12 @@ const Navbar = () => {
           </>
         ) : (
           <div style={styles.userMenu}>
-            <div onClick={toggleDropdown} style={styles.username}>
-              {username} &#x25BC;
+            <div
+              onClick={handleLogout}
+              style={styles.dropdownItemLogout}
+            >
+              Log out
             </div>
-            {dropdownOpen && (
-              <div style={styles.dropdown}>
-                <Link to="/profile" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>Profile</Link>
-                <Link to="/orders" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>Orders</Link>
-                <div style={styles.dropdownItem} onClick={handleLogout}>Logout</div>
-              </div>
-            )}
           </div>
         )}
       </div>
@@ -97,30 +111,15 @@ const styles = {
   },
   userMenu: {
     position: 'relative',
-    cursor: 'pointer',
   },
-  username: {
-    fontWeight: 'bold',
-    userSelect: 'none',
-  },
-  dropdown: {
-    position: 'absolute',
-    top: 'calc(100% + 5px)',
-    right: 0,
-    backgroundColor: 'white',
-    color: '#1877F2',
-    borderRadius: 4,
-    boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-    minWidth: 120,
-    zIndex: 200,
-  },
-  dropdownItem: {
+  dropdownItemLogout: {
     padding: '10px 15px',
     cursor: 'pointer',
     borderBottom: '1px solid #ddd',
     textDecoration: 'none',
-    color: '#1877F2',
-  },
+    color: 'red',  
+    fontWeight: 'bold',
+  }
 };
 
 export default Navbar;
