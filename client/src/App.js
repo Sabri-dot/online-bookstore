@@ -15,6 +15,8 @@ import AddBook from './pages/AddBook';
 import PrivateRoute from './components/PrivateRoute'; // importojmë PrivateRoute
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AdminDashboard from './pages/AdminDashboard';
+import ManageBooks from './pages/admin/ManageBooks';
 
 function App() {
   return (
@@ -28,8 +30,9 @@ function App() {
           <Route path="/books/:id" element={<BookDetails />} />
           <Route path="/books" element={<BooksPage />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-
+          <Route path="/contact" element={<ContactPage />} />        
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/books" element={<ManageBooks />} />
           {/* Shtojmë rruget private me kontroll role */}
 
           {/* Vetëm përdorues të kyçur mund të shtojnë libra */}
