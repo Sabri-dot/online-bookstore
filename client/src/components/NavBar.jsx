@@ -55,6 +55,7 @@ const Navbar = () => {
     <Link to="/admin/comments" style={styles.link}>Menaxho Komentet (Admin)</Link>
     <Link to="/admin/genres" style={styles.link}>Menaxho Zhanret (Admin)</Link>
     <Link to="/admin/purchases" className="nav-link">Menaxho Blerjet (Admin)</Link>
+    <Link to="/admin/users" style={styles.link}>Menaxho Përdoruesit (Admin)</Link>
   </>
 )}
       </div>
