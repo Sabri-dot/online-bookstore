@@ -45,7 +45,8 @@
   width: 220px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   text-align: center;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
 .book-card:hover {
@@ -72,6 +73,7 @@
   font-style: italic;
 }
 
+/* About Section Styling */
 .about-section {
   background: #3498db;
   color: white;
@@ -90,3 +92,67 @@
   max-width: 700px;
   margin: 0 auto;
 }
+
+/* HERO BANNER */
+
+.hero-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5%;
+  min-height: 80vh;
+  background-size: cover;
+  background-position: center;
+  transition: all 0.3s ease-in-out;
+  color: white;
+}
+
+.hero-banner:hover {
+  filter: brightness(1.05);
+}
+
+/* Teksti i Hero Banner-it, zgjerohet deri në 60% të gjerësisë */
+.hero-text {
+  max-width: 600px;
+  flex: 1 1 60%;
+}
+
+/* Butoni me efekt hover */
+.hover-grow {
+  transition: transform 0.3s ease;
+}
+
+.hover-grow:hover {
+  transform: scale(1.05);
+}
+
+/* FOTOJA NË HERO BANNER */
+
+.hero-image-animated {
+  max-height: 400px; /* Rritje e madhësisë së fotos */
+  width: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  animation: slideIn 1s ease-out forwards;
+  transition: transform 0.3s ease;
+  flex-shrink: 0; /* Nuk zvogëlohet në flex container */
+  margin-left: auto; /* E vendos më në të djathtë */
+}
+
+.hero-image-animated:hover {
+  transform: scale(1.05) translateY(-5px);
+}
+
+/* Animacioni i fotos - futja nga e djathta me transparencë */
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
