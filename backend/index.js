@@ -15,7 +15,7 @@ const adminGenresRoutes = require('./routes/admin/genres');
 const adminUsersRoutes = require('./routes/admin/users');
 const adminCommentsRoutes = require('./routes/admin/comments');
 const adminPurchasesRoutes = require('./routes/admin/purchases');
-
+const booksRoutes = require('./routes/books');
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -81,6 +81,9 @@ app.use('/api/admin/genres', adminGenresRoutes);
 app.use('/api/admin/users', adminUsersRoutes);
 app.use('/api/admin/comments', adminCommentsRoutes);
 app.use('/api/admin/purchases', adminPurchasesRoutes);
+//
+
+app.use('/api/books', booksRoutes);
 
 // ✅ Start server
 app.listen(PORT, () => {

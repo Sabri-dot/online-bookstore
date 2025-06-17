@@ -1,6 +1,7 @@
 const pool = require('../models/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Log = require('../models/Log');  // import modelin për log
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 
@@ -45,6 +46,13 @@ exports.login = async (req, res) => {
     // Gjej përdoruesin sipas email-it
     const [users] = await pool.execute('SELECT * FROM users WHERE email = ?', [email]);
     if (users.length === 0) {
+      await Log.create({
+        action: 'login',
+        details: { email },
+        ipAddress: req.ip,
+        status: 'fail',
+        error: 'User not found',
+      });
       return res.status(401).json({ message: 'Email ose fjalëkalimi i gabuar.' });
     }
 
@@ -53,6 +61,14 @@ exports.login = async (req, res) => {
     // Kontrollo fjalëkalimin
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
+      await Log.create({
+        userId: user.id,
+        action: 'login',
+        details: { email },
+        ipAddress: req.ip,
+        status: 'fail',
+        error: 'Password mismatch',
+      });
       return res.status(401).json({ message: 'Email ose fjalëkalimi i gabuar.' });
     }
 
@@ -62,6 +78,15 @@ exports.login = async (req, res) => {
       JWT_SECRET,
       { expiresIn: '1d' }
     );
+
+    // Ruaj në logs login-in e suksesshëm
+ await Log.create({
+  userId: user.id.toString(),
+  action: 'login',
+  details: { email: user.email },
+  ipAddress: req.ip,
+  status: 'success',
+});
 
     // Kthe token dhe user info (pa password)
     res.json({
@@ -75,6 +100,13 @@ exports.login = async (req, res) => {
     });
   } catch (error) {
     console.error('Gabim gjatë login:', error);
+    await Log.create({
+      action: 'login',
+      details: { email },
+      ipAddress: req.ip,
+      status: 'fail',
+      error: error.message,
+    });
     res.status(500).json({ message: 'Gabim në server gjatë login.' });
   }
 };

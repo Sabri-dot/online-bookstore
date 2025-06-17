@@ -1,27 +1,13 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const logSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: false, // nëse ka përdorues, e ruaj, nëse jo, lejo bosh
-  },
-  action: {
-    type: String,
-    required: true, // p.sh. "login", "logout", "book_purchase", "comment_added"
-  },
-  description: {
-    type: String,
-    required: false, // opsionale, për detaje më të hollësishme
-  },
-  ipAddress: {
-    type: String,
-    required: false, // për ruajtjen e IP-së së përdoruesit
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  }
+  userId: { type: String, required: false },  // ndryshuar nga ObjectId në String
+  action: { type: String, required: true },
+  details: { type: Object },
+  ipAddress: { type: String },
+  status: { type: String },
+  error: { type: String },
+  createdAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model("Log", logSchema);
+module.exports = mongoose.model('Log', logSchema);
