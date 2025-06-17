@@ -9,4 +9,5 @@ const commentSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Comment', commentSchema);
+// ✅ Parandalon OverwriteModelError
+module.exports = mongoose.models.Comment || mongoose.model('Comment', commentSchema);
