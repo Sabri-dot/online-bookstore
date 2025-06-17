@@ -18,6 +18,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import AdminDashboard from './pages/AdminDashboard';
 import ManageBooks from './pages/admin/ManageBooks';
 import ManageComments from './pages/admin/ManageComments';
+import ManageGenres from './pages/admin/ManageGenres';
 function App() {
   return (
     <Router>
@@ -34,6 +35,7 @@ function App() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/books" element={<ManageBooks />} />
           <Route path="/admin/comments" element={<ManageComments />} />
+          <Route path="/admin/genres" element={<ManageGenres />} />
           {/* Shtojmë rruget private me kontroll role */}
 
           {/* Vetëm përdorues të kyçur mund të shtojnë libra */}
