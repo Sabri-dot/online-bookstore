@@ -263,16 +263,20 @@ const ManageBooks = () => {
   };
 
   // Nxjerr zhanret nga backend
-  const fetchGenres = async () => {
-    try {
-      const res = await fetch('http://localhost:5001/api/admin/genres');
-      if (!res.ok) throw new Error('Gabim gjatë marrjes së zhanreve');
-      const data = await res.json();
-      setGenres(data);
-    } catch (err) {
-      alert(err.message);
-    }
-  };
+ const fetchGenres = async () => {
+  const token = localStorage.getItem('token');
+  try {
+    const res = await fetch('http://localhost:5001/api/admin/genres', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error('Gabim gjatë marrjes së zhanreve');
+    const data = await res.json();
+    setGenres(data);
+  } catch (err) {
+    alert(err.message);
+  }
+};
+
 
   useEffect(() => {
     fetchBooks();
