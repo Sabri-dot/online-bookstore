@@ -50,8 +50,11 @@ const Navbar = () => {
         <Link to="/contact" style={styles.link}>Kontakt</Link>
         {/* Këtu shtojmë link për Admin vetëm nëse është admin */}
         {role === 'admin' && (
-          <Link to="/admin/books" style={styles.link}>Menaxho Librat (Admin)</Link>
-        )}
+  <>
+    <Link to="/admin/books" style={styles.link}>Menaxho Librat (Admin)</Link>
+    <Link to="/admin/comments" style={styles.link}>Menaxho Komentet (Admin)</Link>
+  </>
+)}
       </div>
 
       <div style={styles.authSection}>
