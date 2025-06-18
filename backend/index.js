@@ -15,24 +15,28 @@ const adminGenresRoutes = require('./routes/admin/genres');
 const adminUsersRoutes = require('./routes/admin/users');
 const adminCommentsRoutes = require('./routes/admin/comments');
 const adminPurchasesRoutes = require('./routes/admin/purchases');
+const adminContactRoutes = require('./routes/admin/contactRoutes');
+
 const booksRoutes = require('./routes/books');
+const publicContactRoutes = require('./routes/publicContact'); // Rruga publike për kontakt
+
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// ✅ MongoDB connection
+// MongoDB connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/online_bookstore_db')
   .then(() => console.log('✅ MongoDB connected successfully!'))
   .catch((err) => console.error('❌ MongoDB connection failed:', err));
 
-// ✅ Middleware
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// ✅ Auth route
+// Auth route
 app.use('/api/auth', authRoutes);
 
-// ✅ Public routes - Genres & Books (MySQL)
+// Public routes - Genres & Books (MySQL)
 app.get('/api/genres', async (req, res) => {
   try {
     const [rows] = await pool.execute('SELECT name FROM genres ORDER BY name');
@@ -71,21 +75,25 @@ app.get('/api/books/genre/:genreName', async (req, res) => {
   }
 });
 
-// ✅ Public API routes
+// Public API routes
 app.use('/api/purchases', purchaseRoutes);
 app.use('/api/comments', commentRoutes);
 
-// ✅ Admin API routes
+// Public Contact route
+app.use('/api/contact', publicContactRoutes);
+
+// Admin API routes
 app.use('/api/admin/books', adminBooksRoutes);
 app.use('/api/admin/genres', adminGenresRoutes);
 app.use('/api/admin/users', adminUsersRoutes);
 app.use('/api/admin/comments', adminCommentsRoutes);
 app.use('/api/admin/purchases', adminPurchasesRoutes);
-//
+app.use('/api/admin/contact', adminContactRoutes);
 
+// Books route
 app.use('/api/books', booksRoutes);
 
-// ✅ Start server
+// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
