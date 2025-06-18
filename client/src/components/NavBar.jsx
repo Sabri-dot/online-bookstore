@@ -56,6 +56,7 @@ const Navbar = () => {
     <Link to="/admin/genres" style={styles.link}>Menaxho Zhanret (Admin)</Link>
     <Link to="/admin/purchases" className="nav-link">Menaxho Blerjet (Admin)</Link>
     <Link to="/admin/users" style={styles.link}>Menaxho Përdoruesit (Admin)</Link>
+    <Link to="/admin/emails" style={styles.link}>Menaxho Email-at (Admin)</Link>
   </>
 )}
       </div>

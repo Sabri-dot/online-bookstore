@@ -1,8 +1,7 @@
-// src/components/ContactUs.jsx
 import React, { useState, useMemo, useEffect } from 'react';
+import axios from 'axios';
 
 const ContactUs = ({ user: propUser }) => {
-  // Merr user nga prop ose nga localStorage
   const userFromStorage = useMemo(() => {
     try {
       const stored = localStorage.getItem('user');
@@ -14,7 +13,6 @@ const ContactUs = ({ user: propUser }) => {
 
   const user = propUser || userFromStorage;
 
-  // Vlera fillestare e formës
   const initialFormData = {
     fullName: user?.username || '',
     companyName: '',
@@ -32,7 +30,6 @@ const ContactUs = ({ user: propUser }) => {
   const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' });
 
   useEffect(() => {
-    // Rifreskon fullName dhe email-in nëse user ndryshon
     setFormData((prev) => ({
       ...prev,
       fullName: user?.username || '',
@@ -51,14 +48,13 @@ const ContactUs = ({ user: propUser }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!user) {
       setSubmitStatus({ type: 'error', message: 'Nuk jeni i identifikuar. Ju lutem logohuni.' });
       return;
     }
-    // Krahasim i username me trim + lowercase
     if (
       !formData.fullName ||
       formData.fullName.trim().toLowerCase() !== user.username.trim().toLowerCase()
@@ -91,24 +87,61 @@ const ContactUs = ({ user: propUser }) => {
       return;
     }
 
-    // Simulim dërgimi email-i
-    setSubmitStatus({
-      type: 'success',
-      message: 'Email u dërgua me sukses! Faleminderit që na kontaktuat.',
-    });
+    try {
+      // Merr token-in nga localStorage (ku e ke ruajtur pasi u logove)
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setSubmitStatus({ type: 'error', message: 'Nuk jeni i autorizuar. Ju lutem logohuni.' });
+        return;
+      }
 
-    // Pastro fushat (përveç fullName dhe email)
-    setFormData((prev) => ({
-      ...prev,
-      companyName: '',
-      location: '',
-      phone: '',
-      areaOfContact: '',
-      otherArea: '',
-      message: '',
-      applyToPartner: false,
-    }));
-    setShowOtherArea(false);
+      // Thirr POST në backend
+      const response = await axios.post(
+        'http://localhost:5001/api/contact',
+        {
+          fullName: formData.fullName,
+          companyName: formData.companyName,
+          location: formData.location,
+          phone: formData.phone,
+          email: formData.email,
+          areaOfContact: formData.areaOfContact,
+          otherArea: formData.otherArea,
+          message: formData.message,
+          applyToPartner: formData.applyToPartner,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setSubmitStatus({
+        type: 'success',
+        message: response.data.message || 'Mesazhi u dërgua me sukses!',
+      });
+
+      // Pastro fushat (përveç fullName dhe email)
+      setFormData((prev) => ({
+        ...prev,
+        companyName: '',
+        location: '',
+        phone: '',
+        areaOfContact: '',
+        otherArea: '',
+        message: '',
+        applyToPartner: false,
+      }));
+      setShowOtherArea(false);
+    } catch (error) {
+      console.error('Gabim gjatë dërgimit:', error);
+      setSubmitStatus({
+        type: 'error',
+        message:
+          error.response?.data?.message ||
+          'Gabim gjatë dërgimit të mesazhit. Provoni përsëri më vonë.',
+      });
+    }
   };
 
   return (
