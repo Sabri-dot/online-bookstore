@@ -66,6 +66,7 @@ const Navbar = () => {
             <Link to="/admin/purchases" style={styles.link}>Menaxho Blerjet (Admin)</Link>
             <Link to="/admin/users" style={styles.link}>Menaxho Përdoruesit (Admin)</Link>
             <Link to="/admin/emails" style={styles.link}>Menaxho Email-at (Admin)</Link>
+            <Link to="/admin/logs" className="nav-link">Menaxho Log-et(Admin)</Link>
           </>
         )}
       </div>

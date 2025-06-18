@@ -22,6 +22,7 @@ import ManageGenres from './pages/admin/ManageGenres';
 import ManagePurchases from './pages/admin/ManagePurchases';
 import ManageUsers from './pages/admin/ManageUsers';
 import ManageEmails from './pages/admin/ManageEmails';
+import ManageLogs from './pages/admin/ManageLogs';
 function App() {
   return (
     <Router>
@@ -42,6 +43,7 @@ function App() {
           <Route path="/admin/purchases" element={<ManagePurchases />}/> 
          <Route path="/admin/users" element={<ManageUsers />} />
          <Route path="/admin/emails" element={<ManageEmails />} />
+           <Route path="/admin/logs" element={<ManageLogs />} />
           {/* Shtojmë rruget private me kontroll role */}
 
           {/* Vetëm përdorues të kyçur mund të shtojnë libra */}
