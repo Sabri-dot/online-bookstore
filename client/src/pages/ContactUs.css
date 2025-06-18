@@ -1,0 +1,8 @@
+/* Për të dhënë më shumë hapësirë dhe elegance tek kutitë e kontaktit */
+.border {
+  transition: box-shadow 0.3s ease;
+}
+
+.border:hover {
+  box-shadow: 0 0 15px rgba(41, 128, 185, 0.5);
+}
