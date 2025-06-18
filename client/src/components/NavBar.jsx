@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
   const [role, setRole] = useState(localStorage.getItem('role') || null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +31,23 @@ const Navbar = () => {
     };
   }, []);
 
+  // Close dropdown if click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownOpen]);
+
   const handleLogout = async () => {
     const token = localStorage.getItem('token');
     try {
@@ -49,39 +68,109 @@ const Navbar = () => {
     navigate('/login');
   };
 
+  const toggleDropdown = () => {
+    setDropdownOpen(prev => !prev);
+  };
+
   return (
     <nav style={styles.navbar}>
-      <Link to="/" style={styles.logo}>Online Book Store</Link>
+      <Link to="/" style={{ ...styles.link, marginRight: 60, fontWeight: 'bold', fontSize: 32 }}>
+        Online Book Store
+      </Link>
 
       <div style={styles.navLinks}>
-        <Link to="/" style={styles.link}>Home</Link>
-        <Link to="/books" style={styles.link}>Librat</Link>
-        <Link to="/about" style={styles.link}>Rreth Nesh</Link>
-        <Link to="/contact" style={styles.link}>Kontakt</Link>
+        <Link to="/" style={{ ...styles.link, marginRight: 80,fontSize:22 }}>Home</Link>
+        <Link to="/books" style={{ ...styles.link, marginRight: 80,fontSize:22 }}>Librat</Link>
+        <Link to="/about" style={{ ...styles.link, marginRight: 80,fontSize:22  }}>Rreth Nesh</Link>
+        <Link to="/contact" style={{ ...styles.link, marginRight: 80,fontSize:22  }}>Kontakt</Link>
+
         {role === 'admin' && (
-          <>
-            <Link to="/admin/books" style={styles.link}>Menaxho Librat (Admin)</Link> 
-            <Link to="/admin/comments" style={styles.link}>Menaxho Komentet (Admin)</Link>
-            <Link to="/admin/genres" style={styles.link}>Menaxho Zhanret (Admin)</Link>
-            <Link to="/admin/purchases" style={styles.link}>Menaxho Blerjet (Admin)</Link>
-            <Link to="/admin/users" style={styles.link}>Menaxho Përdoruesit (Admin)</Link>
-            <Link to="/admin/emails" style={styles.link}>Menaxho Email-at (Admin)</Link>
-            <Link to="/admin/logs" className="nav-link">Menaxho Log-et(Admin)</Link>
-          </>
+          <div style={{ position: 'relative', marginRight:80 ,fontSize:22}} ref={dropdownRef}>
+            <span
+              onClick={toggleDropdown}
+              style={{
+                ...styles.link,
+                color: 'white',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                userSelect: 'none',
+                backgroundColor: dropdownOpen ? '#0d6efd' : 'transparent',
+                padding: '4px 8px',
+                borderRadius: 4,
+                transition: 'background-color 0.3s',
+              }}
+            >
+              Admin Dashboard
+            </span>
+
+            {dropdownOpen && (
+              <div
+                style={styles.dropdownMenu}
+              >
+               <Link
+  onClick={() => setDropdownOpen(false)}
+  to="/admin/books"
+  style={{ ...styles.dropdownItem, fontSize: '14px' }}
+>
+  Menaxho Librat (Admin)
+</Link>
+               <Link
+  onClick={() => setDropdownOpen(false)}
+  to="/admin/comments"
+  style={{ ...styles.dropdownItem, fontSize: '14px' }}
+>
+  Menaxho Komentet (Admin)
+</Link>
+               <Link
+  onClick={() => setDropdownOpen(false)}
+  to="/admin/genres"
+  style={{ ...styles.dropdownItem, fontSize: '14px' }}
+>
+  Menaxho Zhanret (Admin)
+</Link>
+                <Link
+  onClick={() => setDropdownOpen(false)}
+  to="/admin/purchases"
+  style={{ ...styles.dropdownItem, fontSize: '14px' }}
+> 
+  Menaxho Blerjet (Admin)
+</Link>
+                <Link
+  onClick={() => setDropdownOpen(false)}
+  to="/admin/users"
+  style={{ ...styles.dropdownItem, fontSize: '14px' }}
+>
+  Menaxho Përdoruesit (Admin)
+</Link>
+                <Link
+  onClick={() => setDropdownOpen(false)}
+  to="/admin/emails"
+  style={{ ...styles.dropdownItem, fontSize: '14px' }}
+>
+  Menaxho Email-at (Admin)
+</Link>
+                <Link
+  onClick={() => setDropdownOpen(false)}
+  to="/admin/logs"
+  style={{ ...styles.dropdownItem, fontSize: '14px' }}
+>
+  Menaxho Log-et (Admin)
+</Link>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
-      <div style={styles.authSection}>
+      <div style={{ marginLeft: 'auto' }}>
         {!isLoggedIn ? (
           <>
             <Link to="/login" style={{ ...styles.link, marginRight: 15 }}>Login</Link>
-            <Link to="/register" style={styles.button}>Register</Link>
+            <Link to="/register" style={{ ...styles.button }}>Register</Link>
           </>
         ) : (
-          <div style={styles.userMenu}>
-            <div onClick={handleLogout} style={styles.dropdownItemLogout}>
-              Log out
-            </div>
+          <div onClick={handleLogout} style={{ ...styles.link, cursor: 'pointer', fontWeight: 'bold', color: 'white',marginRight: 75 }}>
+            Log out
           </div>
         )}
       </div>
@@ -92,32 +181,23 @@ const Navbar = () => {
 const styles = {
   navbar: {
     display: 'flex',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '10px 20px',
     backgroundColor: '#1877F2',
-    color: 'white',
+    padding: '10px 20px',
     position: 'sticky',
     top: 0,
     zIndex: 100,
-  },
-  logo: {
-    fontWeight: 'bold',
-    fontSize: 22,
     color: 'white',
-    textDecoration: 'none',
   },
   navLinks: {
     display: 'flex',
-    gap: 20,
     alignItems: 'center',
   },
   link: {
     color: 'white',
     textDecoration: 'none',
     fontSize: 16,
-    transition: 'color 0.3s',
-    cursor: 'pointer',
+    userSelect: 'none',
   },
   button: {
     padding: '6px 12px',
@@ -129,21 +209,27 @@ const styles = {
     cursor: 'pointer',
     transition: 'background-color 0.3s',
   },
-  authSection: {
+  dropdownMenu: {
+    position: 'absolute',
+    top: 'calc(100% + 5px)',
+    left: 0,
+    backgroundColor: 'white',
+    boxShadow: '0 0 10px rgba(0,0,0,0.15)',
+    borderRadius: 4,
+    minWidth: 220,
+    zIndex: 200,
     display: 'flex',
-    alignItems: 'center',
+    flexDirection: 'column',
   },
-  userMenu: {
-    position: 'relative',
-  },
-  dropdownItemLogout: {
+  dropdownItem: {
     padding: '10px 15px',
-    cursor: 'pointer',
-    borderBottom: '1px solid #ddd',
+    color: 'black',
     textDecoration: 'none',
-    color: 'red',
     fontWeight: 'bold',
-  }
+    cursor: 'pointer',
+    borderBottom: '1px solid #eee',
+    userSelect: 'none',
+  },
 };
 
 export default Navbar;
