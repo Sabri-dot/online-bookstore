@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const contactController = require('../../controllers/admin/contactController');
-const verifyToken = require('../../middlewares/verifyToken');
-const verifyAdmin = require('../../middlewares/verifyAdmin');
+const { verifyToken, verifyAdmin } = require('../../middlewares/verifyToken');
 
 // GET all emails
 router.get('/', verifyToken, verifyAdmin, contactController.getAllEmails);

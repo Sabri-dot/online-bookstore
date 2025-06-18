@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const db = require('../../models/db'); 
-const verifyToken = require('../../middlewares/verifyToken');
-const verifyAdmin = require('../../middlewares/verifyAdmin');
+const { verifyToken, verifyAdmin } = require('../../middlewares/verifyToken');
 
 // GET all users (pa password)
 router.get('/', verifyToken, verifyAdmin, async (req, res) => {

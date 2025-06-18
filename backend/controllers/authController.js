@@ -1,11 +1,11 @@
 const pool = require('../models/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const Log = require('../models/Log');  // import modelin për log
+const Log = require('../models/Log');  // Modeli për ruajtjen e logeve
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 
-exports.register = async (req, res) => {
+const register = async (req, res) => {
   const { username, email, password, role } = req.body;
 
   if (!username || !email || !password) {
@@ -32,7 +32,7 @@ exports.register = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -102,7 +102,7 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.logout = async (req, res) => {
+const logout = async (req, res) => {
   try {
     await Log.create({
       userId: req.user?.id ? req.user.id.toString() : null,
@@ -117,4 +117,10 @@ exports.logout = async (req, res) => {
     console.error('Gabim gjatë logout:', error);
     res.status(500).json({ message: 'Gabim gjatë logout' });
   }
+};
+
+module.exports = {
+  register,
+  login,
+  logout,
 };

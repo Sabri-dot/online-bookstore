@@ -1,14 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/authController');
-const verifyToken = require('../middlewares/verifyToken');
-const logController = require('../controllers/logController');
+const { register, login, logout } = require('../controllers/authController');
+const { verifyToken } = require('../middlewares/verifyToken');
 
-// Rrugët ekzistuese
-router.post('/register', authController.register);
-router.post('/login', authController.login);
-
-// Shto logout me verifyToken dhe logController
-router.post('/logout', verifyToken, logController.logout);
+router.post('/register', register);
+router.post('/login', login);
+router.post('/logout', verifyToken, logout);
 
 module.exports = router;

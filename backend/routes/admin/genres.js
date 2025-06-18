@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../../models/db'); // lidhja me MySQL
-const verifyToken = require('../../middlewares/verifyToken');
-const verifyAdmin = require('../../middlewares/verifyAdmin');
+const { verifyToken, verifyAdmin } = require('../../middlewares/verifyToken');
 
 // GET - Merr të gjitha genres
 router.get('/', verifyToken, verifyAdmin, async (req, res) => {

@@ -1,13 +1,19 @@
 const mongoose = require('mongoose');
 
 const logSchema = new mongoose.Schema({
-  userId: { type: String, required: false },  // ndryshuar nga ObjectId në String
+  userId: { type: String, default: null },
   action: { type: String, required: true },
-  details: { type: Object },
+  status: { type: String, required: true },
   ipAddress: { type: String },
-  status: { type: String },
-  error: { type: String },
-  createdAt: { type: Date, default: Date.now },
+  details: { type: Object },
+  createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Log', logSchema);
+const Log = mongoose.model('Log', logSchema);
+
+Log.create = function(data) {
+  const log = new Log(data);
+  return log.save();
+};
+
+module.exports = Log;

@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../../models/db'); // Sipas konfigurimit tënd
+const db = require('../../models/db');
 
-const verifyToken = require('../../middlewares/verifyToken');
-const verifyAdmin = require('../../middlewares/verifyAdmin');
+// Importo middlewaret si destructuring
+const { verifyToken, verifyAdmin } = require('../../middlewares/verifyToken');
 
 // GET librat për admin me zhanrin bashkë
 router.get('/', verifyToken, verifyAdmin, async (req, res) => {
@@ -20,6 +20,7 @@ router.get('/', verifyToken, verifyAdmin, async (req, res) => {
     res.status(500).json({ message: 'Gabim gjatë marrjes së librave' });
   }
 });
+
 // DELETE libër me id
 router.delete('/:id', verifyToken, verifyAdmin, async (req, res) => {
   try {
@@ -32,7 +33,7 @@ router.delete('/:id', verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
-// **Shto GET për zhanret**
+// GET për zhanret
 router.get('/genres', verifyToken, verifyAdmin, async (req, res) => {
   try {
     const [rows] = await db.query('SELECT id, name FROM genres');
@@ -42,7 +43,7 @@ router.get('/genres', verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
-// **Shto POST për shtimin e librit**
+// POST për shtimin e librit
 router.post('/', verifyToken, verifyAdmin, async (req, res) => {
   const { title, author, price, is_free, image_url, genre_id } = req.body;
 
@@ -66,7 +67,8 @@ router.post('/', verifyToken, verifyAdmin, async (req, res) => {
     res.status(500).json({ message: 'Gabim gjatë shtimit të librit' });
   }
 });
-// UPDATE libër me id
+
+// PUT për përditësimin e librit
 router.put('/:id', verifyToken, verifyAdmin, async (req, res) => {
   const bookId = req.params.id;
   const { title, author, price, is_free, image_url, genre_id } = req.body;
@@ -76,13 +78,11 @@ router.put('/:id', verifyToken, verifyAdmin, async (req, res) => {
   }
 
   try {
-    // Përditëso librin në tabelën books
     await db.query(
       'UPDATE books SET title = ?, author = ?, price = ?, is_free = ?, image_url = ? WHERE id = ?',
       [title, author, price || 0, is_free || false, image_url || null, bookId]
     );
 
-    // Përditëso lidhjen me zhanrin në book_genres
     await db.query(
       'UPDATE book_genres SET genre_id = ? WHERE book_id = ?',
       [genre_id, bookId]

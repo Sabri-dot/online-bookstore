@@ -2,9 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Comment = require('../../models/Comment'); // modeli MongoDB
 
-const verifyToken = require('../../middlewares/verifyToken');
-const verifyAdmin = require('../../middlewares/verifyAdmin');
-
+const { verifyToken, verifyAdmin } = require('../../middlewares/verifyToken');
 // GET - Merr të gjitha komentet
 router.get('/', verifyToken, verifyAdmin, async (req, res) => {
   try {

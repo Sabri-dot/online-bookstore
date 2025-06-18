@@ -8,6 +8,7 @@ const pool = require('./models/db'); // MySQL connection pool
 const purchaseRoutes = require('./routes/purchaseRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const authRoutes = require('./routes/auth');
+const logRoutes = require('./routes/logRoutes');
 
 // Admin routes
 const adminBooksRoutes = require('./routes/admin/books');
@@ -81,6 +82,7 @@ app.use('/api/comments', commentRoutes);
 
 // Public Contact route
 app.use('/api/contact', publicContactRoutes);
+app.use('/api/logs', logRoutes); // përdor rrugën /api/logs për log-et
 
 // Admin API routes
 app.use('/api/admin/books', adminBooksRoutes);
