@@ -27,7 +27,7 @@ npm install
 cd backend
 npm start
 
-cd ../frontend
+cd ../client
 npm start
 
 ## Lidhje
