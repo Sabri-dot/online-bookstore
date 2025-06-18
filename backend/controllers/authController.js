@@ -6,23 +6,20 @@ const Log = require('../models/Log');  // import modelin për log
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 
 exports.register = async (req, res) => {
-  const { username, email, password, role } = req.body; // merr role nga frontend
+  const { username, email, password, role } = req.body;
 
   if (!username || !email || !password) {
     return res.status(400).json({ message: 'Të gjitha fushat janë të detyrueshme.' });
   }
 
   try {
-    // Kontrollo nëse ekziston përdoruesi me email
     const [existingUsers] = await pool.execute('SELECT * FROM users WHERE email = ?', [email]);
     if (existingUsers.length > 0) {
       return res.status(400).json({ message: 'Email-i është përdorur.' });
     }
 
-    // Hash fjalëkalimin
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Shto përdoruesin me rolin (nëse nuk jepet, default 'user')
     await pool.execute(
       'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
       [username, email, hashedPassword, role || 'user']
@@ -43,7 +40,6 @@ exports.login = async (req, res) => {
   }
 
   try {
-    // Gjej përdoruesin sipas email-it
     const [users] = await pool.execute('SELECT * FROM users WHERE email = ?', [email]);
     if (users.length === 0) {
       await Log.create({
@@ -57,12 +53,10 @@ exports.login = async (req, res) => {
     }
 
     const user = users[0];
-
-    // Kontrollo fjalëkalimin
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
       await Log.create({
-        userId: user.id,
+        userId: user.id.toString(),
         action: 'login',
         details: { email },
         ipAddress: req.ip,
@@ -72,23 +66,20 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Email ose fjalëkalimi i gabuar.' });
     }
 
-    // Gjenero token JWT përfshirë rolin në payload
     const token = jwt.sign(
       { id: user.id, username: user.username, email: user.email, role: user.role },
       JWT_SECRET,
       { expiresIn: '1d' }
     );
 
-    // Ruaj në logs login-in e suksesshëm
- await Log.create({
-  userId: user.id.toString(),
-  action: 'login',
-  details: { email: user.email },
-  ipAddress: req.ip,
-  status: 'success',
-});
+    await Log.create({
+      userId: user.id.toString(),
+      action: 'login',
+      details: { email: user.email },
+      ipAddress: req.ip,
+      status: 'success',
+    });
 
-    // Kthe token dhe user info (pa password)
     res.json({
       token,
       user: {
@@ -108,5 +99,22 @@ exports.login = async (req, res) => {
       error: error.message,
     });
     res.status(500).json({ message: 'Gabim në server gjatë login.' });
+  }
+};
+
+exports.logout = async (req, res) => {
+  try {
+    await Log.create({
+      userId: req.user?.id ? req.user.id.toString() : null,
+      action: 'logout',
+      status: 'success',
+      ipAddress: req.ip,
+      details: {},
+    });
+
+    res.json({ message: 'Logout successful' });
+  } catch (error) {
+    console.error('Gabim gjatë logout:', error);
+    res.status(500).json({ message: 'Gabim gjatë logout' });
   }
 };

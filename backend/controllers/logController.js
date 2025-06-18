@@ -1,23 +1,42 @@
-const Log = require('../models/Log');
+const Log = require('../models/Log'); // rruga ku e ke modelin e logs
 
-// Merr log-et (për shembull për admin)
-exports.getLogs = async (req, res) => {
+// Funksion ndihmës për krijim logu
+exports.createLog = async ({ userId, action, details = {}, ipAddress = '', status = '', error = '' }) => {
   try {
-    const logs = await Log.find().populate('userId', 'name').sort({ createdAt: -1 });
-    res.json(logs);
-  } catch (error) {
-    res.status(500).json({ message: "Gabim gjatë marrjes së log-eve", error });
+    const logEntry = new Log({
+      userId,
+      action,
+      details,
+      ipAddress,
+      status,
+      error,
+    });
+    await logEntry.save();
+  } catch (err) {
+    console.error('Gabim gjatë krijimit të logut:', err);
   }
 };
 
-// Shto një log të ri
-exports.addLog = async (req, res) => {
-  const { userId, action, description, ipAddress } = req.body;
+// Funksion për logout që krijon log dhe kthen përgjigjen
+exports.logout = async (req, res) => {
+  const userId = req.user?.id || null;
+  const ipAddress = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
   try {
-    const newLog = new Log({ userId, action, description, ipAddress });
-    await newLog.save();
-    res.status(201).json(newLog);
+    await exports.createLog({
+      userId,
+      action: 'logout',
+      details: {},
+      ipAddress,
+      status: 'success',
+    });
+
+    // Nëse ke ndonjë mekanizëm për invalidim token-i, bëje këtu.
+    // Për shembull, fshirja e cookie, ose blacklisting token.
+
+    res.json({ message: 'Logout me sukses' });
   } catch (error) {
-    res.status(500).json({ message: "Gabim gjatë shtimit të log-ut", error });
+    console.error('Gabim në logout:', error);
+    res.status(500).json({ message: 'Gabim gjatë procesit të logout' });
   }
 };
