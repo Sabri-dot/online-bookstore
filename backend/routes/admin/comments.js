@@ -29,7 +29,26 @@ router.post('/', verifyToken, verifyAdmin, async (req, res) => {
     res.status(500).json({ message: 'Gabim gjatë shtimit të komenteve' });
   }
 });
+// PUT - Përditëso një koment
+router.put('/:id', verifyToken, verifyAdmin, async (req, res) => {
+  const { commentText, rating, isAnonymous } = req.body;
 
+  try {
+    const updatedComment = await Comment.findByIdAndUpdate(
+      req.params.id,
+      { commentText, rating, isAnonymous },
+      { new: true }
+    );
+
+    if (!updatedComment) {
+      return res.status(404).json({ message: 'Komenti nuk u gjet' });
+    }
+
+    res.status(200).json({ message: 'Komenti u përditësua me sukses', comment: updatedComment });
+  } catch (err) {
+    res.status(500).json({ message: 'Gabim gjatë përditësimit të komenteve' });
+  }
+});
 // DELETE - Fshi një koment
 router.delete('/:id', verifyToken, verifyAdmin, async (req, res) => {
   try {
