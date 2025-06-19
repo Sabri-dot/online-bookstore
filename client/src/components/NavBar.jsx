@@ -74,15 +74,15 @@ const Navbar = () => {
 
   return (
     <nav style={styles.navbar}>
-      <Link to="/" style={{ ...styles.link, marginRight: 60, fontWeight: 'bold', fontSize: 32 }}>
+      <Link to="/" style={{ ...styles.link, marginRight: 80, fontWeight: 'bold', fontSize: 32 }}>
         Online Book Store
       </Link>
 
       <div style={styles.navLinks}>
-        <Link to="/" style={{ ...styles.link, marginRight: 80,fontSize:22 }}>Home</Link>
-        <Link to="/books" style={{ ...styles.link, marginRight: 80,fontSize:22 }}>Librat</Link>
-        <Link to="/about" style={{ ...styles.link, marginRight: 80,fontSize:22  }}>Rreth Nesh</Link>
-        <Link to="/contact" style={{ ...styles.link, marginRight: 80,fontSize:22  }}>Kontakt</Link>
+        <Link to="/" style={{ ...styles.link, marginRight: 90,fontSize:22 }}>Home</Link>
+        <Link to="/books" style={{ ...styles.link, marginRight: 90,fontSize:22 }}>Librat</Link>
+        <Link to="/about" style={{ ...styles.link, marginRight: 90,fontSize:22  }}>Rreth Nesh</Link>
+        <Link to="/contact" style={{ ...styles.link, marginRight: 90,fontSize:22  }}>Kontakt</Link>
 
         {role === 'admin' && (
           <div style={{ position: 'relative', marginRight:80 ,fontSize:22}} ref={dropdownRef}>
@@ -169,7 +169,7 @@ const Navbar = () => {
             <Link to="/register" style={{ ...styles.button }}>Register</Link>
           </>
         ) : (
-          <div onClick={handleLogout} style={{ ...styles.link, cursor: 'pointer', fontWeight: 'bold', color: 'white',marginRight: 75 }}>
+        <div onClick={handleLogout} style={styles.dropdownItemLogout}>
             Log out
           </div>
         )}
@@ -230,6 +230,19 @@ const styles = {
     borderBottom: '1px solid #eee',
     userSelect: 'none',
   },
+   dropdownItemLogout: {
+    padding: '10px 15px',
+    cursor: 'pointer',
+    borderBottom: '1px solid #ddd',
+    textDecoration: 'none',
+    backgroundColor: 'red',  // Sfond i kuq
+    color: 'white',          // Tekst i bardhë
+    fontWeight: 'bold',
+    borderRadius: '4px',     // Këndet e buta
+    textAlign: 'center',     // Qëndrimi i tekstit në mes
+    marginRight:'20px'
+  },
 };
+
 
 export default Navbar;

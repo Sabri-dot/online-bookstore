@@ -5,8 +5,8 @@ const ManageComments = () => {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
 
-  // Fusha për koment të ri
   const [newComment, setNewComment] = useState({
     userId: '',
     bookId: '',
@@ -15,7 +15,9 @@ const ManageComments = () => {
     isAnonymous: false,
   });
 
-  // Shtojmë shtetin për modalin e fshirjes
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
 
@@ -38,13 +40,11 @@ const ManageComments = () => {
     }
   };
 
-  // Kur klikohet butoni Fshij, hap modalin dhe ruaj id-në e komenti që do fshihet
   const confirmDelete = (id) => {
     setCommentToDelete(id);
     setShowDeleteModal(true);
   };
 
-  // Fshirja reale pas konfirmimit
   const handleDelete = async () => {
     try {
       await axios.delete(`http://localhost:5001/api/admin/comments/${commentToDelete}`, {
@@ -80,10 +80,28 @@ const ManageComments = () => {
     }
 
     try {
-      const res = await axios.post('http://localhost:5001/api/admin/comments', newComment, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setComments([res.data, ...comments]);
+      if (isEditing && editingCommentId) {
+        await axios.put(
+          `http://localhost:5001/api/admin/comments/${editingCommentId}`,
+          newComment,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        // Rifresko listën që të marrim të dhënat e sakta nga databaza
+        await fetchComments();
+
+        setSuccessMessage('✅ Komenti u përditësua me sukses!');
+        setTimeout(() => setSuccessMessage(''), 3000); // fshi mesazhin pas 3 sekondash
+
+        setIsEditing(false);
+        setEditingCommentId(null);
+      } else {
+        const res = await axios.post('http://localhost:5001/api/admin/comments', newComment, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setComments([res.data.comment, ...comments]);
+      }
+
       setNewComment({
         userId: '',
         bookId: '',
@@ -92,8 +110,21 @@ const ManageComments = () => {
         isAnonymous: false,
       });
     } catch (err) {
-      alert('Gabim gjatë shtimit të komentit.');
+      alert('Gabim gjatë shtimit ose përditësimit të komentit.');
     }
+  };
+
+  const handleEdit = (comment) => {
+    setIsEditing(true);
+    setEditingCommentId(comment._id);
+    setNewComment({
+      userId: comment.userId,
+      bookId: comment.bookId,
+      commentText: comment.commentText,
+      rating: comment.rating,
+      isAnonymous: comment.isAnonymous,
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (loading) return <p>Duke ngarkuar komentet...</p>;
@@ -103,9 +134,12 @@ const ManageComments = () => {
     <div className="container mt-4">
       <h2 className="mb-4">Menaxho Komentet (Admin)</h2>
 
-      {/* Forma për Shtim Komenti */}
+      {successMessage && (
+        <div className="alert alert-success">{successMessage}</div>
+      )}
+
       <form onSubmit={handleAddComment} className="mb-5 p-4 border rounded bg-light">
-        <h4>Shto Koment të Ri</h4>
+        <h4>{isEditing ? 'Përditëso Komentin' : 'Shto Koment të Ri'}</h4>
         <div className="mb-3">
           <label className="form-label">User ID</label>
           <input
@@ -163,10 +197,11 @@ const ManageComments = () => {
           />
           <label className="form-check-label" htmlFor="isAnonymous">Koment anonim</label>
         </div>
-        <button type="submit" className="btn btn-primary">Shto Koment</button>
+        <button type="submit" className="btn btn-primary">
+          {isEditing ? 'Ruaj Ndryshimet' : 'Shto Koment'}
+        </button>
       </form>
 
-      {/* Lista e komenteve */}
       {comments.length === 0 ? (
         <p>Nuk ka komente për t’u shfaqur.</p>
       ) : (
@@ -182,21 +217,33 @@ const ManageComments = () => {
                 <div><strong>Teksti i Komentit:</strong> {comment.commentText}</div>
                 <div><strong>Vlerësimi:</strong> {comment.rating}</div>
                 <div><strong>Anonim:</strong> {comment.isAnonymous ? 'Po' : 'Jo'}</div>
-                <div><small className="text-muted">Krijuar më: {new Date(comment.createdAt).toLocaleString()}</small></div>
+                <div>
+                  <small className="text-muted">
+                    Krijuar më: {comment.createdAt ? new Date(comment.createdAt).toLocaleString() : 'N/A'}
+                  </small>
+                </div>
               </div>
-              <button
-                className="btn btn-danger btn-sm"
-                onClick={() => confirmDelete(comment._id)}
-                title="Fshij Komentin"
-              >
-                Fshij
-              </button>
+              <div className="d-flex gap-2">
+                <button
+                  className="btn btn-warning btn-sm"
+                  onClick={() => handleEdit(comment)}
+                  title="Edito Komentin"
+                >
+                  Edito
+                </button>
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={() => confirmDelete(comment._id)}
+                  title="Fshij Komentin"
+                >
+                  Fshij
+                </button>
+              </div>
             </li>
           ))}
         </ul>
       )}
 
-      {/* Modal për konfirmim fshirjeje */}
       {showDeleteModal && (
         <div
           className="modal fade show"
