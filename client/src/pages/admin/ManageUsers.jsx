@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Table, Modal, Form } from 'react-bootstrap';
 import axios from 'axios';
 
 const API_BASE = 'http://localhost:5001/api/admin/users';
@@ -106,11 +105,16 @@ const ManageUsers = () => {
   return (
     <div className="container mt-4">
       <h2>Menaxho Përdoruesit</h2>
-      <Button variant="primary" className="mb-3" onClick={handleAddUser}>
+      {/* Shto butonin thjesht me button dhe klasat bootstrap */}
+      <button
+        type="button"
+        className="btn btn-primary mb-3"
+        onClick={handleAddUser}
+      >
         + Shto Përdorues
-      </Button>
+      </button>
 
-      <Table striped bordered hover responsive>
+      <table className="table table-striped table-bordered table-hover table-responsive">
         <thead>
           <tr>
             <th>ID</th>
@@ -128,107 +132,162 @@ const ManageUsers = () => {
               <td>{user.email}</td>
               <td>{user.role}</td>
               <td>
-                <Button
-                  variant="warning"
-                  size="sm"
-                  className="me-2"
+                <button
+                  type="button"
+                  className="btn btn-warning btn-sm me-2"
                   onClick={() => handleEditUser(user)}
                 >
                   Edito
-                </Button>
-                <Button
-                  variant="danger"
-                  size="sm"
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger btn-sm"
                   onClick={() => handleDeleteClick(user)}
                 >
                   Fshi
-                </Button>
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
-      </Table>
+      </table>
 
       {/* Modal për shtim/editim */}
-      <Modal show={showAddEditModal} onHide={() => setShowAddEditModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>{currentUser ? 'Edito Përdorues' : 'Shto Përdorues'}</Modal.Title>
-        </Modal.Header>
-        <Form onSubmit={handleSubmit}>
-          <Modal.Body>
-            <Form.Group className="mb-3" controlId="formUsername">
-              <Form.Label>Username</Form.Label>
-              <Form.Control
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
+      <div
+        className={`modal fade ${showAddEditModal ? 'show d-block' : ''}`}
+        tabIndex="-1"
+        aria-modal={showAddEditModal ? 'true' : undefined}
+        role="dialog"
+        style={showAddEditModal ? { backgroundColor: 'rgba(0,0,0,0.5)' } : {}}
+      >
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <form onSubmit={handleSubmit}>
+              <div className="modal-header">
+                <h5 className="modal-title">{currentUser ? 'Edito Përdorues' : 'Shto Përdorues'}</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowAddEditModal(false)}
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className="modal-body">
+                <div className="mb-3">
+                  <label htmlFor="username" className="form-label">Username</label>
+                  <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    className="form-control"
+                    required
+                    autoFocus
+                  />
+                </div>
 
-            <Form.Group className="mb-3" controlId="formEmail">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
+                <div className="mb-3">
+                  <label htmlFor="email" className="form-label">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="form-control"
+                    required
+                  />
+                </div>
 
-            <Form.Group className="mb-3" controlId="formPassword">
-              <Form.Label>Password {currentUser ? '(lëre bosh për të mos ndryshuar)' : ''}</Form.Label>
-              <Form.Control
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                {...(!currentUser && { required: true })}
-              />
-            </Form.Group>
+                <div className="mb-3">
+                  <label htmlFor="password" className="form-label">
+                    Password {currentUser ? '(lëre bosh për të mos ndryshuar)' : ''}
+                  </label>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="form-control"
+                    {...(!currentUser && { required: true })}
+                  />
+                </div>
 
-            <Form.Group className="mb-3" controlId="formRole">
-              <Form.Label>Roli</Form.Label>
-              <Form.Select
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-              >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-              </Form.Select>
-            </Form.Group>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowAddEditModal(false)}>
-              Anulo
-            </Button>
-            <Button variant="primary" type="submit">
-              Ruaj
-            </Button>
-          </Modal.Footer>
-        </Form>
-      </Modal>
+                <div className="mb-3">
+                  <label htmlFor="role" className="form-label">Roli</label>
+                  <select
+                    id="role"
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    className="form-select"
+                  >
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowAddEditModal(false)}
+                >
+                  Anulo
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  Ruaj
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
 
       {/* Modal për fshirje */}
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Konfirmo Fshirjen</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>A jeni të sigurt që doni të fshini përdoruesin <strong>{userToDelete?.username}</strong>?</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Anulo
-          </Button>
-          <Button variant="danger" onClick={confirmDelete}>
-            Fshi
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <div
+        className={`modal fade ${showDeleteModal ? 'show d-block' : ''}`}
+        tabIndex="-1"
+        aria-modal={showDeleteModal ? 'true' : undefined}
+        role="dialog"
+        style={showDeleteModal ? { backgroundColor: 'rgba(0,0,0,0.5)' } : {}}
+        onClick={() => setShowDeleteModal(false)}
+      >
+        <div className="modal-dialog modal-dialog-centered" onClick={e => e.stopPropagation()}>
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title text-danger">Konfirmo Fshirjen</h5>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={() => setShowDeleteModal(false)}
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <p>A jeni të sigurt që doni të fshini përdoruesin <strong>{userToDelete?.username}</strong>?</p>
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowDeleteModal(false)}
+              >
+                Anulo
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={confirmDelete}
+              >
+                Fshi
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
