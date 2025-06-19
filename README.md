@@ -1,35 +1,70 @@
-# Online BookStore
+# 📚 Online BookStore
 
-Ky është një aplikacion full-stack për menaxhimin e një librarie online, i zhvilluar me React, Express.js, MySQL dhe MongoDB.
+**Online BookStore** është një aplikacion **full-stack** për menaxhimin dhe blerjen e librave online, ndërtuar me **React**, **Express.js**, **MySQL**, dhe **MongoDB**. Aplikacioni lejon përdoruesit të regjistrohen, të blejnë libra, të lënë komente dhe të menaxhohen nga një administrator përmes një paneli kontrolli.
 
-## Teknologjitë
+---Klono repo-n: https://github.com/Sabri-dot/online-bookstore.git
 
-- Frontend: React
-- Backend: Express.js (Node.js)
-- Bazat e të dhënave: MySQL dhe MongoDB
-- Kontroll versioni: Git & GitHub
-- Menaxhim detyrash: Trello
+## 🚀 Teknologjitë Kryesore
 
-## Si të nisni projektin
+### 🎨 Frontend (React)
+- React.js
+- React Router DOM
+- Axios
+- Bootstrap
+- JWT (për ruajtjen e sesioneve)
 
-1. Klono repo-n: https://github.com/Sabri-dot/online-bookstore.git
+### 🔧 Backend (Node.js + Express.js)
+- Express.js
+- JWT & Bcrypt
+- CORS & dotenv
+- Nodemon (për zhvillim)
 
-2. Instaloni varësitë për backend dhe frontend:
+### 🗄️ Bazat e të Dhënave
+- **MySQL** – për të dhënat strukturore (përdorues, libra, zhanre, porosi)
+- **MongoDB** – për të dhënat gjysmë-strukturore (komente)
 
+---
+
+## 📦 Instalimi i Paketave
+
+### 1️⃣ Backend
+Navigoni tek Back-End
 cd backend
+npm install 
+
+Ketu do te instalohen keto paketa 
+npm install express mysql2 mongoose bcrypt jsonwebtoken cors dotenv nodemon
+
+
+Me pas navigoni ne Front-End tek folderi client 
+cd ../client
 npm install
 
-cd ../frontend
-npm install
+Ketu do te instalohen keto paketa 
+npm install react-router-dom axios bootstrap 
 
-3. Nisni serverat:
-
+⚙️ Nisja e Projektit
+bash
+Copy
+Edit
+# Backend
 cd backend
 npm start
 
+# Frontend
 cd ../client
 npm start
+Aplikacioni do të hapet në:
 
-## Lidhje
+Frontend: http://localhost:3000
+Backend: http://localhost:5001
+(Mos harroni te navigoni ne cd backend dhe cd client perpara se ta startoni projektin)
 
-Për pyetje, kontaktoni në: sj61243@ubt-uni.net
+
+🔚 Statusi i Projektit
+✅ Projekti është në fazë përfundimtare – funksionalitetet kryesore janë implementuar dhe testuar.
+
+
+📫 Kontakt
+GitHub: https://github.com/Sabri-dot/online-bookstore
+Email: sj61243@ubt-uni.net
