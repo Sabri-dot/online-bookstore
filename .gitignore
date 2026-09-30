@@ -1,19 +1,32 @@
-# Node modules (backend dhe frontend)
+# Dependencies
+
 node_modules/
 
-# Build folder (React)
-build/
+# Environment variables and secrets
 
-# Env files me fjalëkalime apo variabla private
 .env
+.env.*
+!.env.example
 
-# Log files
+# Build outputs
+
+build/
+dist/
+dist-ssr/
+
+# Logs
+
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
 # OS files
+
 .DS_Store
 
-# VS Code settings
+# Editor settings
+
 .vscode/
+.idea/
